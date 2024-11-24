@@ -12,7 +12,7 @@ Projekt realizowany jest w ramach zespołu:
 - **MoncyFull19**
 - **Domin2002**
 - **Szymon141**
-
+- **nppg2024**
 ---
 
 ### 🛠️ Proces analizy
