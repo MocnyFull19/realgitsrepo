@@ -155,7 +155,9 @@ write.csv(samochody_new, "pozmianach1.csv", row.names = FALSE)
 
 #Wczytanie danych po zmianach
 samochody_01 <- read_csv("pozmianach1.csv")
+samochody_01
 
 #Wizualizacja brakujacych obserwacji
 vis_miss(samochody_01, warn_large_data = FALSE)
+
 
