@@ -91,3 +91,10 @@ samochody_01_cleaned <- samochody_01[!is.na(samochody_01$fuel_type), ]
 # Wyświetlenie oczyszczonej ramki danych
 print(samochody_01_cleaned)
 vis_miss(samochody_01_cleaned, warn_large_data = FALSE)
+
+#decyzja o usunięciu obserwacji z NA 
+samochody_dowiz <- samochody_01[complete.cases(samochody_01), ]
+
+# Wyświetlenie oczyszczonej ramki danych
+print(samochody_dowiz)
+vis_miss(samochody_dowiz, warn_large_data = FALSE)
