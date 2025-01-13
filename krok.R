@@ -91,5 +91,11 @@ samochody_01$fuel_type <- fuel_brand_imputed$fuel_type
 samochody_01$brand <- fuel_brand_imputed$brand
 
 vis_miss(samochody_01, warn_large_data = FALSE)
+#####
 
+# Usunięcie wierszy z NA w kolumnie 'fuel_type'
+samochody_01_cleaned <- samochody_01[!is.na(samochody_01$fuel_type), ]
 
+# Wyświetlenie oczyszczonej ramki danych
+print(samochody_01_cleaned)
+vis_miss(samochody_01_cleaned, warn_large_data = FALSE)
