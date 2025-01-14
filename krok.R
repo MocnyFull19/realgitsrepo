@@ -39,8 +39,6 @@ samochody_01$year <- samochody_01_imputed$year
 
 # Sprawdzenie czy braki zostały uzupełnione
 vis_miss(samochody_01, warn_large_data = FALSE)
-# porównanie starego " pozmianach1i nowego zbioru, gdzie poprawiona została kolumna year 
-vis_miss(pozmianach1, warn_large_data = FALSE)
 
 # Zastąpienie NA w kolumnie fuel_type
 samochody_01$fuel_type <- ifelse(
