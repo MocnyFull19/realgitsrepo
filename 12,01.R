@@ -147,9 +147,7 @@ samochody_new <- fix_year_and_mileage(samochody_new)
 
 ###COPILOT KONIEC
 
-#Imputacje danych
-mydata_knn <- kNN(samochody_new)
-petal_width_kNN <- mydata_knn$Petal.Width
+
 
 write.csv(samochody_new, "pozmianach1.csv", row.names = FALSE)
 
