@@ -12,15 +12,15 @@ top_5_brands <- samochody_dowiz %>%
 samochody_top_5_brands <- samochody_dowiz %>%
   filter(brand %in% top_5_brands)
 
-# przekształcenie z dodatkową obsługą błędów
+# przekształcenie
 dane <- samochody_dowiz %>%
   mutate(
     mileage = mileage %>%
-      str_remove_all("[^0-9]") %>%  # Usuń wszystko poza cyframi
-      as.numeric(),                 # Konwersja na liczby
+      str_remove_all("[^0-9]") %>%  
+      as.numeric(),                 
     engine_capacity = engine_capacity %>%
-      str_remove_all("[^0-9]") %>%  # Usuń wszystko poza cyframi
-      as.numeric()                  # Konwersja na liczby
+      str_remove_all("[^0-9]") %>%  
+      as.numeric()                  
   )
 
 
