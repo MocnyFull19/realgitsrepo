@@ -2,12 +2,28 @@ library(dplyr)
 library(ggplot2)
 library(stringr)
 
-# Przekształcenie kolumn mileage i engine_capacity na liczby
+# Liczenie liczby wystąpień każdej marki
+top_5_brands <- samochody_dowiz %>%
+  count(brand) %>%
+  top_n(5, n) %>%
+  pull(brand)
+
+# Filtrujemy dane, aby uwzględnić tylko te 5 marek
+samochody_top_5_brands <- samochody_dowiz %>%
+  filter(brand %in% top_5_brands)
+
+# przekształcenie z dodatkową obsługą błędów
 dane <- samochody_dowiz %>%
   mutate(
-    mileage = as.numeric(str_replace_all(mileage, " km", "") %>% str_replace_all(",", "")),
-    engine_capacity = as.numeric(str_replace_all(engine_capacity, " cm3", "") %>% str_replace_all(",", ""))
+    mileage = mileage %>%
+      str_remove_all("[^0-9]") %>%  # Usuń wszystko poza cyframi
+      as.numeric(),                 # Konwersja na liczby
+    engine_capacity = engine_capacity %>%
+      str_remove_all("[^0-9]") %>%  # Usuń wszystko poza cyframi
+      as.numeric()                  # Konwersja na liczby
   )
+
+
 
 # Wykres kołowy- typ paliwa
 fuel_count <- samochody_dowiz %>%
@@ -143,18 +159,4 @@ ggplot(samochody_avg_top_5_year, aes(x = avg_mileage, y = avg_price_in_pln, colo
   theme(legend.title = element_blank())
 
 
-# Rozkład ceny i przebiegu
-library(gridExtra)
-
-price_histogram <- ggplot(samochody_dowiz %>% filter(price_in_pln < 500000), aes(x = price_in_pln)) +
-  geom_histogram(binwidth = 1000, fill = "steelblue", color = "black", alpha = 0.7) +
-  labs(title = "Rozkład cen samochodów", x = "Cena (PLN)", y = "Liczba samochodów") +
-  theme_minimal()
-
-mileage_histogram <- ggplot(samochody_dowiz %>% filter(mileage > 1000), aes(x = mileage)) +
-  geom_histogram(binwidth = 5000, fill = "lightgreen", color = "black", alpha = 0.7) +
-  labs(title = "Rozkład przebiegu samochodów", x = "Przebieg (km)", y = "Liczba samochodów") +
-  theme_minimal()
-
-grid.arrange(price_histogram, mileage_histogram, ncol = 2)
 
