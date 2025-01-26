@@ -2,16 +2,6 @@ library(dplyr)
 library(ggplot2)
 library(stringr)
 
-# Liczenie liczby wystąpień każdej marki
-top_5_brands <- samochody_dowiz %>%
-  count(brand) %>%
-  top_n(5, n) %>%
-  pull(brand)
-
-# Filtrujemy dane, aby uwzględnić tylko te 5 marek
-samochody_top_5_brands <- samochody_dowiz %>%
-  filter(brand %in% top_5_brands)
-
 # przekształcenie
 dane <- samochody_dowiz %>%
   mutate(
@@ -23,10 +13,18 @@ dane <- samochody_dowiz %>%
       as.numeric()                  
   )
 
+# Liczenie liczby wystąpień każdej marki
+top_5_brands <- dane %>%
+  count(brand) %>%
+  top_n(5, n) %>%
+  pull(brand)
 
+# Filtrujemy dane, aby uwzględnić tylko te 5 marek
+samochody_top_5_brands <- dane %>%
+  filter(brand %in% top_5_brands)
 
 # Wykres kołowy- typ paliwa
-fuel_count <- samochody_dowiz %>%
+fuel_count <- dane %>%
   count(fuel_type)
 
 ggplot(fuel_count, aes(x = "", y = n, fill = fuel_type)) +
@@ -110,7 +108,7 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 
 # Wykres cena vs przebieg w zaleznosci od roku produkcji
-samochody_dowiz <- samochody_dowiz %>%
+dane <- dane %>%
   mutate(year_group = case_when(
     year >= 1995 & year <= 2000 ~ "1995-2000",
     year >= 2001 & year <= 2005 ~ "2001-2005",
@@ -121,14 +119,14 @@ samochody_dowiz <- samochody_dowiz %>%
     TRUE ~ "Other"
   ))
 
-samochody_avg <- samochody_dowiz %>%
+dane_avg <- dane %>%
   group_by(year_group) %>%
   summarise(
     avg_mileage = mean(mileage, na.rm = TRUE),
     avg_price_in_pln = mean(price_in_pln, na.rm = TRUE)
   )
 
-ggplot(samochody_avg, aes(x = avg_mileage, y = avg_price_in_pln, color = year_group)) +
+ggplot(dane_avg, aes(x = avg_mileage, y = avg_price_in_pln, color = year_group)) +
   geom_point(alpha = 0.7, size = 3) +
   labs(title = "Cena vs. Przebieg w zależności od przedziału rocznego", x = "Średni przebieg (km)", y = "Średnia cena (PLN)") +
   theme_minimal() +
