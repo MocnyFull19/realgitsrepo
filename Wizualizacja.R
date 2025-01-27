@@ -130,7 +130,7 @@ ggplot(dane_avg, aes(x = avg_mileage, y = avg_price_in_pln, color = year_group))
   geom_point(alpha = 0.7, size = 3) +
   labs(title = "Cena vs. Przebieg w zależności od przedziału rocznego", x = "Średni przebieg (km)", y = "Średnia cena (PLN)") +
   theme_minimal() +
-  scale_color_manual(values = rainbow(length(unique(samochody_avg$year_group)))) +
+  scale_color_manual(values = rainbow(length(unique(dane_avg$year_group)))) +
   theme(legend.title = element_blank())
 
 # Wykres średniej ceny i przebiegu w zależności od marki samochodu i grupy lat produkcji
@@ -155,6 +155,7 @@ ggplot(samochody_avg_top_5_year, aes(x = avg_mileage, y = avg_price_in_pln, colo
        shape = "Grupa lat produkcji") +
   theme_minimal() +
   theme(legend.title = element_blank())
+
 
 
 
