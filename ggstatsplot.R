@@ -1,5 +1,5 @@
 library(ggstatsplot)
-
+library(ggplot2)
 ggbetweenstats(
   data = dane,
   x = fuel_type,
@@ -33,7 +33,7 @@ type ="pearson",
 #W tym przypadku, wartość -0.42 oznacza umiarkowaną, ujemną korelację. To potwierdza, że wraz ze wzrostem przebiegu, cena samochodu ma tendencję do spadku
 
 #3 wykres 
-png("wykres_bez_bledu1.png", width = 1600, height = 1200, res = 300)
+png("marka_a_cena.png", width = 1600, height = 1200, res = 300)
 
 samochody_top_5_brands <- na.omit(samochody_top_5_brands)  # Usuń brakujące dane
 
@@ -41,7 +41,7 @@ ggbetweenstats(
   data = samochody_top_5_brands,
   x = brand,
   y = price_in_pln,
-  title = "Czytelny wykres bez błędów",
+  title = "zależność ceny od marki samochodu",
   xlab = "Marka",
   ylab = "Cena (PLN)",
   type = "np",
@@ -64,7 +64,7 @@ ggbetweenstats(
 dev.off()
 
 
-#Wykres bez błedu 1 png przedstawia porównanie średnich cen samochodów różnych marek.
+#Wykres przedstawia porównanie średnich cen samochodów różnych marek.
 
 #Główne wnioski:
 # Różnice w cenach między markami: Wykres wyraźnie pokazuje, że średnie ceny samochodów różnią się w zależności od marki.
@@ -75,17 +75,25 @@ dev.off()
 
 
 #4
+png("histogram.png", width = 1600, height = 1200, res = 300)
 gghistostats(
   data = dane,
   x = price_in_pln,
   title = "Histogram cen samochodów z testem normalności",
   xlab = "Cena (PLN)",
-  test.value = 0, # Wartość testowa, jeśli istotna
-  type = "parametric" # Shapiro-Wilk
-)
+  test.value = 0,
+  type = "parametric"
+) +
+  scale_x_continuous(
+    limits = c(0, 1000000),
+    breaks = seq(0, 1000000, by = 200000),  # Etykiety co 200k
+    labels = scales::comma
+  )
+dev.off()
 #Ceny samochodów są zróżnicowane: Większość samochodów ma relatywnie niską cenę, ale istnieje też grupa samochodów bardzo drogich, co powoduje, że rozkład jest prawostronnie asymetryczny.
 #Rozkład cen nie jest normalny: Dane nie spełniają założeń testu t-Studenta, co oznacza, że nie możemy bezpośrednio stosować testów statystycznych opartych na rozkładzie normalnym
-
+#Histogram jest silnie asymetryczny, z długim ogonem po prawej stronie. Oznacza to, że większość samochodów ma ceny w niższych przedziałach, a tylko nieliczne osiągają bardzo wysokie ceny.
+# przedział ufności dla średniej ceny samochodu z populacji wynosi znajduje się między 75 931.13 PLN a 77 270.43 PLN. Oznacza to, że mamy 95% pewności, że prawdziwa średnia cena samochodu w populacji ogólnej mieści się w tym przedziale.
 5. 
 ggscatterstats(
   data = dane,
@@ -98,8 +106,8 @@ ggscatterstats(
   bf.message = FALSE  # Ukrywa Bayes Factor
 )
 
-Im nowszy samochód tym średnia cena również rośnie.
-Silna korelacja: Współczynnik korelacji Pearsona jest dodatni i bliski 1, co wskazuje na silną, dodatnią liniową zależność między ceną a rokiem produkcji.
-Istotność statystyczna: Bardzo niskie p-value (prawie równe 0) dla testu t-Studenta oznacza, że zaobserwowana zależność nie jest przypadkowa i istnieje wysokie prawdopodobieństwo, że w populacji ogólnej również występuje taka zależność
-Chociaż istnieje wyraźna tendencja wzrostowa, dane są dość rozproszone wokół linii trendu. Oznacza to, że na cenę samochodu wpływają również inne czynniki oprócz roku produkcji, takie jak marka, model, wyposażenie, stan techniczny itp.
-spółczynnik korelacji Pearsona: Mierzy siłę i kierunek liniowej zależności między dwiema zmiennymi. W tym przypadku, wartość 0.46 oznacza umiarkowaną, dodatnią korelację. To potwierdza, że wraz ze wzrostem roku produkcji, cena samochodu ma tendencję do wzrostu.
+#Im nowszy samochód tym średnia cena również rośnie.
+#Silna korelacja: Współczynnik korelacji Pearsona jest dodatni i bliski 1, co wskazuje na silną, dodatnią liniową zależność między ceną a rokiem produkcji.
+#Istotność statystyczna: Bardzo niskie p-value (prawie równe 0) dla testu t-Studenta oznacza, że zaobserwowana zależność nie jest przypadkowa i istnieje wysokie prawdopodobieństwo, że w populacji ogólnej również występuje taka zależność
+#Chociaż istnieje wyraźna tendencja wzrostowa, dane są dość rozproszone wokół linii trendu. Oznacza to, że na cenę samochodu wpływają również inne czynniki oprócz roku produkcji, takie jak marka, model, wyposażenie, stan techniczny itp.
+#Współczynnik korelacji Pearsona: Mierzy siłę i kierunek liniowej zależności między dwiema zmiennymi. W tym przypadku, wartość 0.46 oznacza umiarkowaną, dodatnią korelację. To potwierdza, że wraz ze wzrostem roku produkcji, cena samochodu ma tendencję do wzrostu.
