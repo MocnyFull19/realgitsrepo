@@ -28,7 +28,7 @@ vis_miss(samochody_01, warn_large_data = FALSE)
 library(mice)
 
 help("mice")
-# Imputacja braków danych za pomocą funkcji mice
+#Imputacja braków danych za pomocą funkcji mice 
 imputed_data <- mice(samochody_01, method = "pmm", m = 5, maxit = 10, seed = 123)
 
 # Pobranie pierwszego uzupełnionego zbioru danych

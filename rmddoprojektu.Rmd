@@ -1,0 +1,268 @@
+---
+title: "Projekt"
+output: html_document
+date: "2025-01-31"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Projekt analiza danych samochodów
+
+# **Struktura pracy** 📝
+
+## [1 Data Cleansing & Data Wrangling]{.underline}
+
+### 1.1 Wczytanie danych
+
+Wczytujemy plik z surowymi danymi samochody_new.csv [Kliknij, aby pobrać plik](data/samochody_new.csv)
+
+### 1.2 Usunięcie brakujących wartości
+
+Badamy i usuwamy brakujące wartości w danych ( w skrypcie R-studio realgits.8.12) używamy do tego pakietów (tidyverse) i library(naniar)
+
+```{r}
+library(readr)
+library(dplyr)
+library(naniar)
+# Wczytanie pliku CSV
+samochody_new <- read_csv("data/samochody_new.csv")
+
+# Podgląd danych
+head(samochody_new)
+```
+
+```{r eval=FALSE}
+library(naniar)
+library(ggplot2)
+library(dplyr)
+#Brakujace obserwacje
+n_miss(samochody_new) #liczba brakujacych danych
+n_complete(samochody_new) #liczba kompletynch obserwacji
+prop_miss(samochody_new) #proporcja
+# Sprawdzanie brakujących wartości
+samochody_new %>% 
+  miss_case_table()
+
+# Wizualizacja braków danych
+
+#Wizualizacja brakujacych obserwacji
+vis_miss(samochody_new, warn_large_data = FALSE)
+#wizualizacja brakujacych danych
+gg_miss_fct(samochody_new, fct = gearbox) 
+#brakujace dane ze wzgledu na typ skrzyni biegow
+gg_miss_upset(samochody_new, 
+              nsets = 10)
+```
+
+### 1.3 Poprawa formatowania i eliminacja ocena brakujących
+
+```{r}
+library(readr)
+library(naniar)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(dlookr)
+library(editrules)
+library(VIM)
+library(deducorrect)
+library(ISLR)
+#Zastapienie innych wartosci specjalnych na NA
+is.special <- function(x){
+  if (is.numeric(x)) !is.finite(x) else is.na(x)
+}
+
+sapply(samochody_new, is.special)
+#Dodanie warunkow do danych
+unique(samochody_new$gearbox)
+RULE <- editset(c("year >= 1900","gearbox %in% c('manual','automatic')"
+                  , "price_in_pln > 0"))
+violated <- violatedEdits(RULE, samochody_new)
+```
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+library(readr)
+library(visdat)
+
+# Funkcja do zamiany danych w kolumnach year i engine_capacity
+fix_year_and_engine_capacity <- function(data) {
+  invalid_year <- grepl("cm3$", data$year)
+  data$engine_capacity[invalid_year] <- data$year[invalid_year]
+  data$year[invalid_year] <- NA
+  invalid_engine_capacity <- grepl("^[1-2][0-9]{3}$", data$engine_capacity) & 
+      as.numeric(data$engine_capacity) > 1900
+  data$year[invalid_engine_capacity] <- data$engine_capacity[invalid_engine_capacity]
+  data$engine_capacity[invalid_engine_capacity] <- NA
+  return(data)
+}
+
+# Zastosuj funkcję do swojego zbioru danych
+samochody_new <- fix_year_and_engine_capacity(samochody_new)
+
+# Funkcja do zamiany danych w kolumnach year i fuel_type
+fix_year_and_fuel_type <- function(data) {
+  fuel_types <- c("Elektryczny", "Benzyna", "Diesel", "Hybryda", "Benzyna+LPG")
+  invalid_year <- data$year %in% fuel_types
+  data$fuel_type[invalid_year] <- data$year[invalid_year]
+  data$year[invalid_year] <- NA
+  invalid_fuel_type <- grepl("^[1-2][0-9]{3}$", data$fuel_type) & 
+      as.numeric(data$fuel_type) > 1900
+  data$year[invalid_fuel_type] <- data$fuel_type[invalid_fuel_type]
+  data$fuel_type[invalid_fuel_type] <- NA
+  return(data)
+}
+
+# Zastosuj funkcję do swojego zbioru danych
+samochody_new <- fix_year_and_fuel_type(samochody_new)
+
+# Funkcja do zamiany danych w kolumnach fuel_type i mileage
+fix_fuel_type_and_mileage <- function(data) {
+  invalid_fuel_type <- grepl("km$", data$fuel_type)
+  data$mileage[invalid_fuel_type] <- data$fuel_type[invalid_fuel_type]
+  data$fuel_type[invalid_fuel_type] <- NA
+  fuel_types <- c("Elektryczny", "Benzyna", "Diesel", "Hybryda", "Benzyna+LPG")
+  invalid_mileage <- data$mileage %in% fuel_types
+  data$fuel_type[invalid_mileage] <- data$mileage[invalid_mileage]
+  data$mileage[invalid_mileage] <- NA
+  return(data)
+}
+
+# Zastosuj funkcję do swojego zbioru danych
+samochody_new <- fix_fuel_type_and_mileage(samochody_new)
+
+# Funkcja do zamiany danych w kolumnach year i mileage
+fix_year_and_mileage <- function(data) {
+  invalid_year <- grepl("km$", data$year)
+  data$mileage[invalid_year] <- data$year[invalid_year]
+  data$year[invalid_year] <- NA
+  invalid_mileage <- grepl("^[1-2][0-9]{3}$", data$mileage) & 
+      as.numeric(data$mileage) > 1900
+  data$year[invalid_mileage] <- data$mileage[invalid_mileage]
+  data$mileage[invalid_mileage] <- NA
+  return(data)
+}
+
+# Zastosuj funkcję do swojego zbioru danych
+samochody_new <- fix_year_and_mileage(samochody_new)
+
+# Zapisz zmodyfikowane dane do pliku
+write.csv(samochody_new, "pozmianach1.csv", row.names = FALSE)
+
+# Wczytanie danych po zmianach
+samochody_01 <- read_csv("pozmianach1.csv")
+
+# Wizualizacja brakujących danych
+vis_miss(samochody_01, warn_large_data = FALSE)
+```
+
+### 1.4 Imputowanie wartości dla brakujących lub błędnych danych
+
+```{r, message=FALSE, warning=FALSE, include=FALSE}
+#Biblioteki
+library(readr)
+library(naniar)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+library(dlookr)
+library(editrules)
+library(VIM)
+library(deducorrect)
+library(ISLR) 
+library(hot.deck)
+library(mice)
+```
+
+
+```{r}
+#Imputacja braków danych za pomocą funkcji mice 
+imputed_data <- mice(samochody_01, method = "pmm", m = 5, maxit = 10, seed = 123)
+
+# Pobranie pierwszego uzupełnionego zbioru danych
+samochody_01_imputed <- complete(imputed_data, 1)
+
+# Nadpisanie kolumny year w oryginalnym zbiorze
+samochody_01$year <- samochody_01_imputed$year 
+
+# Sprawdzenie czy braki zostały uzupełnione
+vis_miss(samochody_01, warn_large_data = FALSE)
+
+# Zastąpienie NA w kolumnie fuel_type
+samochody_01$fuel_type <- ifelse(
+  is.na(samochody_01$fuel_type) & samochody_01$engine_capacity == "Elektryczny",
+  "Elektryczny",
+  samochody_01$fuel_type
+)
+# efekty zastąpienia NA w elektrycznych autach
+vis_miss(samochody_01, warn_large_data = FALSE)
+# eliminowanie NA w hybrydach
+samochody_01$fuel_type <- ifelse(
+  is.na(samochody_01$fuel_type) & samochody_01$engine_capacity == "Hybryda",
+  "Hybryda",
+  samochody_01$fuel_type
+)
+vis_miss(samochody_01, warn_large_data = FALSE)
+
+
+samochody_01$engine_capacity <- trimws(tolower(samochody_01$engine_capacity))
+
+# Zastąpienie braków w fuel_type
+samochody_01$fuel_type <- ifelse(
+  is.na(samochody_01$fuel_type) & samochody_01$engine_capacity == "elektryczny",
+  "Elektryczne",
+  samochody_01$fuel_type
+)
+table(is.na(samochody_01$fuel_type))
+##
+# Wyodrębnienie kolumn fuel_type i brand
+samochody_fuel_brand <- samochody_01[, c("fuel_type", "brand"), drop = FALSE]
+
+# Imputacja tylko dla kolumn fuel_type i brand
+imputed_data <- mice(samochody_fuel_brand, method = c("polyreg", "polyreg"), m = 5, maxit = 10, seed = 123)
+
+# Uzyskanie pierwszej imputacji
+fuel_brand_imputed <- complete(imputed_data, 1)
+
+# Zaktualizowanie oryginalnych kolumn fuel_type i brand w samochody_01
+samochody_01$fuel_type <- fuel_brand_imputed$fuel_type
+samochody_01$brand <- fuel_brand_imputed$brand
+
+vis_miss(samochody_01, warn_large_data = FALSE)
+```
+
+## 1.5 Oczyszcenie danych z dalszych brakujących wartości
+
+```{r}
+# Usunięcie wierszy z NA w kolumnie 'fuel_type'
+samochody_01_cleaned <- samochody_01[!is.na(samochody_01$fuel_type), ]
+
+# Wyświetlenie oczyszczonej ramki danych
+print(samochody_01_cleaned)
+vis_miss(samochody_01_cleaned, warn_large_data = FALSE)
+
+#decyzja o usunięciu obserwacji z NA 
+samochody_dowiz <- samochody_01[complete.cases(samochody_01), ]
+```
+
+Wynikiem jest poniższa tabela z danymi po oczyszczeniu z brakujących wartości:
+
+```{r,echo=FALSE}
+print(samochody_dowiz)
+vis_miss(samochody_dowiz, warn_large_data = FALSE)
+```
+
+Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
+
+##2 Wizualizacja danych ##3 Analiza opisowa
+
+## [4 Wnioskowanie statystyczne]{style="color:green"}
+```{r}
+
+```
+
+##5 Podsumowanie i wnioski końcowe
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

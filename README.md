@@ -52,8 +52,3 @@ Projekt wymaga instalacji następujących pakietów: - `pandas` - `numpy` - `mat
 
 ------------------------------------------------------------------------
 
-# **Struktura pracy** 📝
-
-## 1 Data Cleansing & Data Wrangling
-
-gg \## 2 Wizualizacja danych bg ##3 Analiza opisowa ##4 Wnioskowanie ##5 Podsumowanie i wnioski końcowe
