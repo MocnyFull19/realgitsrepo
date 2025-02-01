@@ -2,6 +2,9 @@
 title: "Projekt"
 output: html_document
 date: "2025-01-31"
+editor_options: 
+  markdown: 
+    wrap: sentence
 ---
 
 ```{r setup, include=FALSE}
@@ -20,20 +23,20 @@ Wczytujemy plik z surowymi danymi samochody_new.csv [Kliknij, aby pobrać plik](
 
 ### 1.2 Usunięcie brakujących wartości
 
-Badamy i usuwamy brakujące wartości w danych ( w skrypcie R-studio realgits.8.12) używamy do tego pakietów (tidyverse) i library(naniar)
+Badamy i usuwamy brakujące wartości w danych, używamy do tego pakietów (tidyverse) i (naniar).
 
-```{r}
+```{r, message=FALSE, warning=FALSE}
 library(readr)
 library(dplyr)
 library(naniar)
 # Wczytanie pliku CSV
-samochody_new <- read_csv("data/samochody_new.csv")
+samochody_new <- read_csv("samochody_new.csv")
 
 # Podgląd danych
 head(samochody_new)
 ```
 
-```{r eval=FALSE}
+```{r}
 library(naniar)
 library(ggplot2)
 library(dplyr)
@@ -58,7 +61,7 @@ gg_miss_upset(samochody_new,
 
 ### 1.3 Poprawa formatowania i eliminacja ocena brakujących
 
-```{r}
+```{r, include=FALSE}
 library(readr)
 library(naniar)
 library(ggplot2)
@@ -175,8 +178,7 @@ library(hot.deck)
 library(mice)
 ```
 
-
-```{r}
+```{r,message=FALSE, warning=FALSE}
 #Imputacja braków danych za pomocą funkcji mice 
 imputed_data <- mice(samochody_01, method = "pmm", m = 5, maxit = 10, seed = 123)
 
@@ -218,10 +220,14 @@ table(is.na(samochody_01$fuel_type))
 ##
 # Wyodrębnienie kolumn fuel_type i brand
 samochody_fuel_brand <- samochody_01[, c("fuel_type", "brand"), drop = FALSE]
+```
 
+```{r, include=FALSE}
 # Imputacja tylko dla kolumn fuel_type i brand
 imputed_data <- mice(samochody_fuel_brand, method = c("polyreg", "polyreg"), m = 5, maxit = 10, seed = 123)
+```
 
+```{r}
 # Uzyskanie pierwszej imputacji
 fuel_brand_imputed <- complete(imputed_data, 1)
 
@@ -258,11 +264,171 @@ Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 ##2 Wizualizacja danych ##3 Analiza opisowa
 
 ## [4 Wnioskowanie statystyczne]{style="color:green"}
-```{r}
+
+```{r, include=FALSE}
+library(ggstatsplot)
+library(ggplot2)
+```
+
+W tym rozdziale przeprowadzona została analiza statystyczna, mająca na celu identyfikację zależności między różnymi cechami samochodów a ich ceną.
+Wykorzystano do tego różne testy statystyczne i metody wizualizacji danych z pakietu ggstatsplot.
+
+\###[***1.Histogram cen samochodów i test normalności***]{.underline}
+
+📌Rozkład cen samochodów nie jest normalny – jest prawostronnie asymetryczny (duża liczba tańszych aut, kilka bardzo drogich).
+📌 Nie można stosować testów parametrycznych opartych na rozkładzie normalnym.
+📌 Przedział ufności dla średniej ceny samochodu wynosi od 75 931 PLN do 77 270 PLN (95% pewności).
+
+📊 Wizualizacja: Histogram cen samochodów, pokazujący asymetrię w rozkładzie.
+
+```{r, message=FALSE, warning=FALSE}
+gghistostats(
+  data = dane,
+  x = price_in_pln,
+  title = "Histogram cen samochodów z testem normalności",
+  xlab = "Cena (PLN)",
+  test.value = 0,
+  type = "parametric"
+) +
+  scale_x_continuous(
+    limits = c(0, 1000000),
+    breaks = seq(0, 1000000, by = 200000),  # Etykiety co 200k
+    labels = scales::comma
+  )
 
 ```
 
-##5 Podsumowanie i wnioski końcowe
+\###[***2.Porównanie cen samochodów w zależności od rodzaju paliwa.***]{.underline}
 
+Za pomocą testu F Welcha sprawdzono, czy różnice w średnich cenach między samochodami elektrycznymi, benzynowymi, hybrydowymi i dieslami są statystycznie istotne.
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Wyniki wskazują, że: ✅ Istnieją istotne różnice cenowe między rodzajami paliwa (p \< 0.001).
+✅ Samochody elektryczne mają wyraźnie wyższe ceny w porównaniu do innych typów paliwa.
+✅ Współczynnik efektu (0.96) sugeruje, że rodzaj paliwa silnie wpływa na cenę.
+✅ Bardzo duża liczba obserwacji (n = 83,625) sprawia, że test jest bardzo wiarygodny
+
+📊 Wizualizacja: Wykres pudełkowy przedstawiający średnie ceny w zależności od rodzaju paliwa.
+
+```{r, echo=FALSE}
+ggbetweenstats(
+  data = dane,
+  x = fuel_type,
+  y = price_in_pln,
+  type = "parametric", 
+  title = "Porównanie średnich cen samochodów w zależności od rodzaju paliwa",
+  xlab = "Rodzaj paliwa",
+  ylab = "Cena (PLN)",
+  messages = FALSE
+)
+```
+
+\###[***3.Korelacja między przebiegiem a ceną samochodu***]{.underline}.
+
+Badanie związku między liczbą przejechanych kilometrów a ceną samochodu wykazało:
+
+```{r, echo=FALSE}
+cor.test(dane$mileage, dane$price_in_pln, method = "spearman")
+```
+
+-Wartość współczynnika korelacji Spearmana wynosi -0.59.
+To oznacza umiarkowaną negatywną korelację między przebiegiem a ceną samochodu.
+Im większy przebieg, tym niższa cena samochodu.
+-Jest to zgodne z intuicją, ponieważ samochody z większym przebiegiem są zazwyczaj starsze i mogą być bardziej zużyte.
+
+-Istotność statystyczna: Korelacja jest statystycznie istotna, więc możemy z dużą pewnością stwierdzić, że ta zależność jest prawdziwa w populacji samochodów.
+
+```{r, echo=FALSE}
+kruskal.test(price_in_pln ~ mileage, data = dane)
+```
+
+Wynik dla statystyka testu Kruskala-Wallisa 47625.
+Jest to miara różnic między grupami.
+Wartość 47625 wskazuje, że różnice między grupami (w tym przypadku cenami samochodów w zależności od przebiegu) są dość duże.
+
+Interpretacja: Hipoteza zerowa (H₀): Zakłada, że nie ma różnic między grupami (w tym przypadku brak różnic w cenach samochodów w zależności od przebiegu).
+Hipoteza alternatywna (H₁): Zakłada, że istnieją różnice między grupami (w tym przypadku ceny samochodów różnią się w zależności od przebiegu).
+Ponieważ p-wartość jest mniejsza niż 0.05 (a konkretnie jest znacznie mniejsza), oznacza to, że odrzucamy hipotezę zerową.
+W związku z tym możemy stwierdzić, że istnieją statystycznie istotne różnice w cenach samochodów w zależności od przebiegu.
+
+Wnioski: Test Kruskala-Wallisa wykazuje, że ceny samochodów różnią się w zależności od ich przebiegu.
+Oznacza to,że w populacji samochodów przebieg może mieć znaczenie dla kształtowania ceny samochodu.
+Warto także zauważyć, że test Kruskala-Wallisa jest testem nieparametrycznym, co oznacza, że nie zakłada on rozkładu normalnego danych.
+Jest to dobry wybór, gdy dane mają rozkład nienormalny lub zawierają wartości odstające.
+
+📊 Wizualizacja: Wykres rozrzutu pokazujący negatywną zależność między przebiegiem a ceną.
+
+```{r}
+plot(dane$mileage, dane$price_in_pln,
+     xlab = "Przebieg (km)",
+     ylab = "Cena (PLN)",
+     main = "Zależność między ceną a przebiegiem samochodu")
+```
+
+###4.[***Wpływ marki na cenę samochodu.***]{.underline}
+
+Porównano ceny samochodów pięciu najpopularniejszych marek, stosując test Kruskala-Wallisa.
+🔹 BMW i Mercedes-Benz są najdroższymi markami.
+🔹 Opel, Peugeot i Volkswagen mają znacząco niższe ceny.
+🔹 Test wykazał istotne różnice między markami (p \< 0.001).
+🔹 Wykres wyraźnie pokazuje, że średnie ceny samochodów różnią się w zależności od marki 📊 Wizualizacja: Wykres przedstawiający medianowe ceny samochodów różnych marek.
+
+```{r}
+png("marka_a_cena.png", width = 1600, height = 1200, res = 300)
+
+samochody_top_5_brands <- na.omit(samochody_top_5_brands)  # Usuń brakujące dane
+
+ggbetweenstats(
+  data = samochody_top_5_brands,
+  x = brand,
+  y = price_in_pln,
+  title = "zależność ceny od marki samochodu",
+  xlab = "Marka",
+  ylab = "Cena (PLN)",
+  type = "np",
+  pairwise.comparisons = TRUE,
+  pairwise.display = "significant",
+  centrality.param = "median",
+  centrality.para.method = "nonparametric",
+  ggtheme = theme_bw(),
+  outlier.tagging = FALSE, # Usuwa wartości odstające
+  messages = FALSE
+) +
+  scale_y_log10(limits = c(1000, 1e6)) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    axis.text = element_text(size = 12),
+    plot.title = element_text(size = 16),
+    legend.position = "bottom"
+  )
+
+dev.off()
+```
+
+\###[***5.Wpływ roku produkcji na cenę***]{.underline}
+
+📌Korelacja Spearmana wynosi 0.77, co potwierdza istotność statystyczną tej zależności 📌 Wykres pokazuje silną dodatnią korelację między rokiem produkcji a ceną samochodu, co oznacza, że nowsze samochody są zazwyczaj droższe.
+📌Zauważalna jest pewna rozbieżność punktów, co sugeruje, że na cenę wpływają także inne czynniki, takie jak marka czy stan techniczny.
+📌 Histogramy wskazują, że większość samochodów pochodzi z lat 2010-2020, a ceny większości pojazdów są poniżej 1 miliona PLN.
+
+📊 Wizualizacja: Wykres rozrzutu pokazujący wzrost cen wraz z nowszym rokiem produkcji.
+
+```{r, message=FALSE, warning=FALSE}
+ggscatterstats(
+  data = dane,
+  x = year,
+  y = price_in_pln,
+  title = "Zależność ceny od roku produkcji samochodu",
+  xlab = "Rok produkcji",
+  ylab = "Cena (PLN)",
+  type = "np",  # Zastosowanie testu Kruskala-Wallisa (non-parametric)
+  marginal = TRUE,  # Dodaje histogramy po bokach
+  bf.message = FALSE  # Ukrywa Bayes Factor
+)
+```
+
+###Podsumowanie 📢 Analiza wykazała, że: ✅ Rodzaj paliwa, marka oraz rok produkcji znacząco wpływają na cenę samochodu.
+✅ Przebieg ma odwrotny wpływ – im większy, tym niższa cena.
+✅ Rozkład cen jest asymetryczny, co wymaga stosowania testów nieparametrycznych.
+
+Wyniki tej analizy mogą pomóc w lepszym zrozumieniu rynku samochodowego i optymalizacji strategii zakupu lub sprzedaży pojazdów.
+🚗📊 ##5 Podsumowanie i wnioski końcowe
