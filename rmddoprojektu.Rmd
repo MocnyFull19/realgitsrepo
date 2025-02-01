@@ -324,7 +324,7 @@ ggbetweenstats(
 
 \###[***3.Korelacja między przebiegiem a ceną samochodu***]{.underline}.
 
-Badanie związku między liczbą przejechanych kilometrów a ceną samochodu wykazało:
+Badanie związku między liczbą przejechanych kilometrów, a ceną samochodu wykazało:
 
 ```{r, echo=FALSE}
 cor.test(dane$mileage, dane$price_in_pln, method = "spearman")
