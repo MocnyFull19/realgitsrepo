@@ -11,26 +11,29 @@ ggbetweenstats(
   messages = FALSE
 )
 ###Wyniki testów statystycznych sugerują, że różnice w średnich cenach między poszczególnymi kategoriami paliw są statystycznie istotne. Oznacza to, że z dużą pewnością możemy stwierdzić, że samochody elektryczne są średnio droższe niż samochody benzynowe, hybrydowe itp.
-#Test ANOVA Welcha wykazał bardzo istotne statystycznie różnice między średnimi cen samochodów w zależności od rodzaju paliwa (p < 0.001).
+#Test  Welcha wykazał bardzo istotne statystycznie różnice między średnimi cen samochodów w zależności od rodzaju paliwa (p < 0.001).
 #Współczynnik efektu jest bardzo wysoki (0.96), co oznacza, że rodzaj paliwa wyjaśnia prawie całą zmienność cen samochodów.
 #Przedział ufności (0.96 – 1.00) wskazuje na bardzo silny efekt.
 #Bardzo duża liczba obserwacji (n = 83,625) sprawia, że test jest bardzo wiarygodny.
 #Ostatecznie można stwierdzić, że rodzaj paliwa silnie wpływa na cenę samochodu, i wynik ten jest bardzo pewny ze względu na ekstremalnie niski poziom p-wartości.
 
-#korelacja przebieg i cena 
-ggscatterstats(
-data = dane,
-x = mileage,
-y = price_in_pln,
-title = "Zależność między ceną a przebiegiem samochodu",
-xlab = "Przebieg (km)",
-ylab = "Cena (PLN)",
-type ="pearson", 
-  )
+2##korelacja przebieg i cena 
+# Wizualizacja danych
+plot(dane$mileage, dane$price_in_pln,
+     xlab = "Przebieg (km)",
+     ylab = "Cena (PLN)",
+     main = "Zależność między ceną a przebiegiem samochodu")
+#istnieje negatywna korelacja między przebiegiem a ceną. Oznacza to, że im większy przebieg samochodu, tym niższa jest jego cena. 
+# Obliczenie korelacji Spearmana
+cor.test(dane$mileage, dane$price_in_pln, method = "spearman")
+#Wartość współczynnika korelacji Spearmana wynosi -0.59.Wartość -0.59 wskazuje na relatywnie silną zależność, ale nie jest to korelacja bardzo silna
+#p-value < 2.2e-16: P-wartość jest bardzo mała (mniejsza niż 0.05), co oznacza, że wynik jest statystycznie istotny. Możemy odrzucić hipotezę zerową (że nie ma korelacji) na poziomie istotności 0.05.
 
-#Wykres przedstawia wyraźną, ujemną zależność między ceną samochodu a jego przebiegiem. Oznacza to, że im większy przebieg samochodu, tym niższa jest jego cena. Jest to intuicyjny wynik, ponieważ samochody z większym przebiegiem są zazwyczaj starsze i mają większy stopień zużycia, co obniża ich wartość rynkową.
-#Współczynnik korelacji Pearsona: Mierzy siłę i kierunek liniowej zależności między dwiema zmiennymi. 
-#W tym przypadku, wartość -0.42 oznacza umiarkowaną, ujemną korelację. To potwierdza, że wraz ze wzrostem przebiegu, cena samochodu ma tendencję do spadku
+#Test Kruskala-Wallisa
+kruskal.test(price_in_pln ~ mileage, data = dane)
+#Kruskal-Wallis chi-squared = 47625: Jest to statystyka testu Kruskala-Wallisa. Jest to miara różnic między grupami. Wartość 47625 wskazuje, że różnice między grupami (w tym przypadku cenami samochodów w zależności od przebiegu) są dość duże.
+#df = 14096: Liczba stopni swobody. Stopnie swobody w testach statystycznych Kruskala-Wallisa są obliczane jako liczba grup minus 1. Jest to informacja o liczbie porównań, które zostały uwzględnione w teście.
+#p-value < 2.2e-16: P-wartość jest mniejsza niż 2.2e-16, co oznacza, że jest to wartość ekstremalnie mała. Jest to wynik statystycznie bardzo istotny.
 
 #3 wykres 
 png("marka_a_cena.png", width = 1600, height = 1200, res = 300)
@@ -102,12 +105,32 @@ ggscatterstats(
   title = "Zależność ceny od roku produkcji samochodu",
   xlab = "Rok produkcji",
   ylab = "Cena (PLN)",
+  type = "np",  # Zastosowanie testu Kruskala-Wallisa (non-parametric)
   marginal = TRUE,  # Dodaje histogramy po bokach
   bf.message = FALSE  # Ukrywa Bayes Factor
 )
+#Współczynnik korelacji Spearmana (ρ = 0.77): Wskazuje na silną, dodatnią korelację między rokiem produkcji a ceną samochodu. Oznacza to, że im nowszy samochód, tym większa szansa, że będzie droższy.
+#Przedział ufności 95% dla ρ: Potwierdza, że korelacja jest istotna statystycznie.
+#Wartość p (p = 0.00): Potwierdza, że korelacja jest istotna statystycznie (p < 0.05).
+#Interpretacja przedstawionego wykresu powinna skupić się na kilku kluczowych aspektach, które pozwolą na lepsze zrozumienie zależności między ceną samochodu a jego rokiem produkcji. Oto one:
+  
+  #1. Wykres punktowy (Scatter plot):
+  
+#  Trend: Na wykresie widzimy wyraźny trend wzrostowy - im nowszy jest samochód (im wyższy rok produkcji), tym wyższa jest jego cena. To zjawisko jest zgodne z oczekiwaniami - nowsze modele są zazwyczaj droższe od starszych.
+#Rozproszenie punktów: Możemy zaobserwować, że punkty na wykresie są dość rozproszone, co oznacza, że cena samochodu nie zależy tylko od roku produkcji. Wpływ na nią mają również inne czynniki, takie jak marka, model, stan techniczny, wyposażenie itp.
+#Punkty odstające: Na wykresie widać kilka punktów, które znacznie odbiegają od głównego trendu. Mogą to być np. luksusowe modele lub samochody kolekcjonerskie, których cena jest znacznie wyższa niż przeciętna dla danego roku produkcji.
+#2. Histogramy brzegowe:
+  
+ # Histogram na osi X (Rok produkcji): Pokazuje rozkład liczby samochodów w zależności od roku produkcji. Widzimy, że najwięcej samochodów w tym zbiorze danych pochodzi z lat 2010-2020.
+#3Histogram na osi Y (Cena): Pokazuje rozkład cen samochodów. Widzimy, że większość samochodów ma cenę poniżej 1 miliona PLN, a tylko nieliczne osiągają ceny powyżej 2 milionów PLN.
+#3. Informacje statystyczne:
+  
+# Współczynnik korelacji Spearmana (ρ = 0.77): Wskazuje na silną, dodatnią korelację między rokiem produkcji a ceną samochodu. Oznacza to, że im nowszy samochód, tym większa szansa, że będzie droższy.
+#Przedział ufności 95% dla ρ: Potwierdza, że korelacja jest istotna statystycznie.
+#Wartość p (p = 0.00): Potwierdza, że korelacja jest istotna statystycznie (p < 0.05).
+#Podsumowanie:
+  
+ # Z wykresu i danych statystycznych wynika, że istnieje silna, dodatnia korelacja między rokiem produkcji a ceną samochodu. Nowsze samochody są zazwyczaj droższe, ale na cenę wpływają również inne czynniki, co widać po rozproszeniu punktów na wykresie. Histogramy brzegowe pozwalają na lepsze zrozumienie rozkładu danych dla roku produkcji i ceny.
 
-#Im nowszy samochód tym średnia cena również rośnie.
-#Silna korelacja: Współczynnik korelacji Pearsona jest dodatni i bliski 1, co wskazuje na silną, dodatnią liniową zależność między ceną a rokiem produkcji.
-#Istotność statystyczna: Bardzo niskie p-value (prawie równe 0) dla testu t-Studenta oznacza, że zaobserwowana zależność nie jest przypadkowa i istnieje wysokie prawdopodobieństwo, że w populacji ogólnej również występuje taka zależność
-#Chociaż istnieje wyraźna tendencja wzrostowa, dane są dość rozproszone wokół linii trendu. Oznacza to, że na cenę samochodu wpływają również inne czynniki oprócz roku produkcji, takie jak marka, model, wyposażenie, stan techniczny itp.
-#Współczynnik korelacji Pearsona: Mierzy siłę i kierunek liniowej zależności między dwiema zmiennymi. W tym przypadku, wartość 0.46 oznacza umiarkowaną, dodatnią korelację. To potwierdza, że wraz ze wzrostem roku produkcji, cena samochodu ma tendencję do wzrostu.
+#Dodatkowe informacje:
+  #Warto zauważyć, że przedstawiona analiza dotyczy konkretnego zbioru danych. Wyniki mogą się różnić dla innych zbiorów danych.
