@@ -25,10 +25,17 @@ Wczytujemy plik z surowymi danymi samochody_new.csv [Kliknij, aby pobrać plik](
 
 Badamy i usuwamy brakujące wartości w danych, używamy do tego pakietów (tidyverse) i (naniar).
 
-```{r, message=FALSE, warning=FALSE}
+```{r,echo=FALSE} 
 library(readr)
 library(dplyr)
 library(naniar)
+library(naniar)
+library(ggplot2)
+library(dplyr)
+```
+
+```{r, message=FALSE, warning=FALSE}
+
 # Wczytanie pliku CSV
 samochody_new <- read_csv("samochody_new.csv")
 
@@ -37,9 +44,7 @@ head(samochody_new)
 ```
 
 ```{r}
-library(naniar)
-library(ggplot2)
-library(dplyr)
+
 #Brakujace obserwacje
 n_miss(samochody_new) #liczba brakujacych danych
 n_complete(samochody_new) #liczba kompletynch obserwacji
