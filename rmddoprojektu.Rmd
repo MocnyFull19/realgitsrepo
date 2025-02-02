@@ -551,7 +551,7 @@ library(ggplot2)
 W tym rozdziale przeprowadzona została analiza statystyczna, mająca na celu identyfikację zależności między różnymi cechami samochodów a ich ceną.
 Wykorzystano do tego różne testy statystyczne i metody wizualizacji danych z pakietu ggstatsplot.
 
-\###[***1.Histogram cen samochodów i test normalności***]{.underline}
+**1.Histogram cen samochodów i test normalności**
 
 📌Rozkład cen samochodów nie jest normalny – jest prawostronnie asymetryczny (duża liczba tańszych aut, kilka bardzo drogich).
 📌 Nie można stosować testów parametrycznych opartych na rozkładzie normalnym.
@@ -576,7 +576,7 @@ gghistostats(
 
 ```
 
-\###[***2.Porównanie cen samochodów w zależności od rodzaju paliwa.***]{.underline}
+**2.Porównanie cen samochodów w zależności od rodzaju paliwa.**
 
 Za pomocą testu F Welcha sprawdzono, czy różnice w średnich cenach między samochodami elektrycznymi, benzynowymi, hybrydowymi i dieslami są statystycznie istotne.
 
@@ -600,7 +600,7 @@ ggbetweenstats(
 )
 ```
 
-\###[***3.Korelacja między przebiegiem a ceną samochodu***]{.underline}.
+**3.Korelacja między przebiegiem a ceną samochodu.**
 
 Badanie związku między liczbą przejechanych kilometrów a ceną samochodu wykazało:
 
@@ -642,7 +642,7 @@ plot(dane$mileage, dane$price_in_pln,
      main = "Zależność między ceną a przebiegiem samochodu")
 ```
 
-###4.[***Wpływ marki na cenę samochodu.***]{.underline}
+**4.[Wpływ marki na cenę samochodu.]{.underline}**
 
 Porównano ceny samochodów pięciu najpopularniejszych marek, stosując test Kruskala-Wallisa.
 🔹 BMW i Mercedes-Benz są najdroższymi markami.
@@ -682,7 +682,7 @@ ggbetweenstats(
 dev.off()
 ```
 
-\###[***5.Wpływ roku produkcji na cenę***]{.underline}
+**5.Wpływ roku produkcji na cenę**
 
 📌Korelacja Spearmana wynosi 0.77, co potwierdza istotność statystyczną tej zależności 📌 Wykres pokazuje silną dodatnią korelację między rokiem produkcji a ceną samochodu, co oznacza, że nowsze samochody są zazwyczaj droższe.
 📌Zauważalna jest pewna rozbieżność punktów, co sugeruje, że na cenę wpływają także inne czynniki, takie jak marka czy stan techniczny.
@@ -704,7 +704,9 @@ ggscatterstats(
 )
 ```
 
-###Podsumowanie 📢 Analiza wykazała, że: ✅ Rodzaj paliwa, marka oraz rok produkcji znacząco wpływają na cenę samochodu.
+### 5. Podsumowanie 
+
+Analiza wykazała, że: ✅ Rodzaj paliwa, marka oraz rok produkcji znacząco wpływają na cenę samochodu.
 ✅ Przebieg ma odwrotny wpływ – im większy, tym niższa cena.
 ✅ Rozkład cen jest asymetryczny, co wymaga stosowania testów nieparametrycznych.
 
