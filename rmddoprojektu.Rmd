@@ -1,5 +1,5 @@
 ---
-title: "Projekt"
+title: "Projekt analiza danych samochodów"
 output: html_document
 date: "2025-01-31"
 editor_options: 
@@ -11,21 +11,19 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Projekt analiza danych samochodów
+## Dominik Łukasiuk, Igor Korusiewicz, Szymon Chodun, Nicholas Pachos
 
-# **Struktura pracy** 📝
-
-## [1 Data Cleansing & Data Wrangling]{.underline}
+## 1 Data Cleansing & Data Wrangling
 
 ### 1.1 Wczytanie danych
 
-Wczytujemy plik z surowymi danymi samochody_new.csv [Kliknij, aby pobrać plik](data/samochody_new.csv)
+Wczytujemy plik z surowymi danymi samochody_new.csv
 
 ### 1.2 Usunięcie brakujących wartości
 
 Badamy i usuwamy brakujące wartości w danych, używamy do tego pakietów (tidyverse) i (naniar).
 
-```{r,echo=FALSE} 
+```{r include =FALSE}
 library(readr)
 library(dplyr)
 library(naniar)
@@ -66,6 +64,8 @@ gg_miss_upset(samochody_new,
 
 ### 1.3 Poprawa formatowania i eliminacja ocena brakujących
 
+Zamieniami dane w odpowiednich kolumnach (np. year z milage, do swojej kolumy)
+
 ```{r, include=FALSE}
 library(readr)
 library(naniar)
@@ -90,7 +90,7 @@ RULE <- editset(c("year >= 1900","gearbox %in% c('manual','automatic')"
 violated <- violatedEdits(RULE, samochody_new)
 ```
 
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, include=FALSE}
 library(readr)
 library(visdat)
 
@@ -161,7 +161,7 @@ vis_miss(samochody_new, warn_large_data = FALSE)
 
 ### 1.4 Imputowanie wartości dla brakujących lub błędnych danych
 
-```{r, message=FALSE, warning=FALSE, include=FALSE}
+```{r, message=FALSE, include=FALSE}
 #Biblioteki
 library(readr)
 library(naniar)
@@ -177,7 +177,7 @@ library(hot.deck)
 library(mice)
 ```
 
-```{r,message=FALSE, warning=FALSE}
+```{r include = FALSE}
 #Imputacja braków danych za pomocą funkcji mice 
 imputed_data <- mice(samochody_new, method = "pmm", m = 5, maxit = 10, seed = 123)
 
@@ -260,7 +260,7 @@ vis_miss(samochody_dowiz, warn_large_data = FALSE)
 
 Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 
-## 2 Wizualizacja danych {style="color:green"}
+## 2 Wizualizacja danych
 
 **Wizualizacja danych** to kluczowy proces w analizie danych, który pozwala na skuteczne przedstawienie informacji w formie graficznej.
 Dzięki odpowiednim wykresom i diagramom, możemy w łatwy sposób zobaczyć wzorce, zależności i trendy, które mogą być trudne do uchwycenia w surowych danych liczbowych.
@@ -291,7 +291,7 @@ samochody_top_5_brands <- dane %>%
 
 **Wykres liniowy (line plot) - Trend cen samochodów w zależności od roku produkcji**
 
-```{r,echo=FALSE}
+```{r,echo=FALSE,  warning=FALSE}
 #Wykres liniowy (line plot) - Trend cen samochodów w zależności od roku produkcji
 dane %>%
   group_by(year) %>%
@@ -459,7 +459,7 @@ Cena samochodu w zależności od przebiegu i rocznika pokazuje wyraźną zależn
 Zwykle najdroższe są samochody nowe lub z niewielkim przebiegiem, ponieważ są wciąż objęte gwarancją, oferują nowoczesne technologie, mają mniejsze zużycie części i są bardziej efektywne pod względem paliwowym.
 Takie auta zazwyczaj utrzymują swoją wartość na rynku przez dłuższy czas.
 
-## 3 Analiza opisowa {style="color:green"}
+## 3 Analiza opisowa 
 
 W tej sekcji przeanalizujemy podstawowe miary statystyczne, takie jak średnia, mediana, minimalne i maksymalne wartości oraz odchylenie standardowe dla kluczowych zmiennych, takich jak przebieg, czy pojemność silnika, a bliżej zbadamy właściowości na przykład skośność i kurtoza dla cen samochodów w zależności od marki.
 Ponadto, zbadamy istniejące korelacje między zmiennymi numerycznymi i sprawdzimy jakie mają wpływ na cenę samochodu.
@@ -474,10 +474,12 @@ library(summarytools)
 
 # Podsumowanie danych
 summary_stats <- dfSummary(dane)
-print(summary_stats)
 
-# HTML
-print(summary_stats, method = "browser", file = "report.html")
+#Renderujemy tabelę bezpośrednio w HTML
+summary_stats_html <- print(summary_stats, method = "render")
+
+#Wyświetlamy tabelę w dokumencie HTML
+summary_stats_html
 ```
 
 Średnia cena samochodów w całym zbiorze wynosi **76 580,2 PLN**, przy odchyleniu standardowym równym **100 937 PLN**, co wskazuje na znaczną zmienność cen w analizowanym zestawie danych.
@@ -527,7 +529,7 @@ ggcorr(
 
 Podsumowując, **rok produkcji** i **przebieg** to kluczowe czynniki wpływające na cenę samochodu w tym zbiorze danych.
 
-```{r, include=FALSE}
+```{r, echo=FALSE}
 # Grupowanie danych po 'brand' i obliczanie statystyk dla każdej grupy
 library(dplyr)
 
@@ -572,7 +574,6 @@ kable(pelna_tabela,
                     "Odchylenie ćwiartkowe", "Skośność", "Kurtoza"),
       caption = "Podsumowanie cen samochodów według marki (w tym ogólnie)")
 
-View(pelna_tabela)
 
 ```
 
@@ -595,7 +596,7 @@ To jedyna marka, której ceny przekraczają 2 miliony PLN.
 
 **Marki popularne** (Toyota, Volkswagen, Ford) mają umiarkowane ceny i stosunkowo stabilny rozkład, co czyni je atrakcyjnymi dla większości klientów.
 
-## 4 Wnioskowanie statystyczne {style="color:green"}
+## 4 Wnioskowanie statystyczne 
 
 ```{r, include=FALSE}
 library(ggstatsplot)
@@ -613,7 +614,7 @@ Wykorzystano do tego różne testy statystyczne i metody wizualizacji danych z p
 
 📊 Wizualizacja: Histogram cen samochodów, pokazujący asymetrię w rozkładzie.
 
-```{r, message=FALSE, warning=FALSE}
+```{r echo = FALSE, warning=FALSE}
 gghistostats(
   data = dane,
   x = price_in_pln,
@@ -658,7 +659,7 @@ ggbetweenstats(
 
 Badanie związku między liczbą przejechanych kilometrów a ceną samochodu wykazało:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, include = FALSE}
 cor.test(dane$mileage, dane$price_in_pln, method = "spearman")
 ```
 
@@ -704,16 +705,15 @@ Porównano ceny samochodów pięciu najpopularniejszych marek, stosując test Kr
 🔹 Test wykazał istotne różnice między markami (p \< 0.001).
 🔹 Wykres wyraźnie pokazuje, że średnie ceny samochodów różnią się w zależności od marki 📊 Wizualizacja: Wykres przedstawiający medianowe ceny samochodów różnych marek.
 
-```{r}
-png("marka_a_cena.png", width = 1600, height = 1200, res = 300)
-
-samochody_top_5_brands <- na.omit(samochody_top_5_brands)  # Usuń brakujące dane
+```{r echo= FALSE, warning=FALSE}
+# Usunięcie brakujących danych
+samochody_top_5_brands <- na.omit(samochody_top_5_brands)
 
 ggbetweenstats(
   data = samochody_top_5_brands,
   x = brand,
   y = price_in_pln,
-  title = "zależność ceny od marki samochodu",
+  title = "Zależność ceny od marki samochodu",
   xlab = "Marka",
   ylab = "Cena (PLN)",
   type = "np",
@@ -722,7 +722,7 @@ ggbetweenstats(
   centrality.param = "median",
   centrality.para.method = "nonparametric",
   ggtheme = theme_bw(),
-  outlier.tagging = FALSE, # Usuwa wartości odstające
+  outlier.tagging = FALSE,  # Usunięcie oznaczania wartości odstających
   messages = FALSE
 ) +
   scale_y_log10(limits = c(1000, 1e6)) +
@@ -732,8 +732,6 @@ ggbetweenstats(
     plot.title = element_text(size = 16),
     legend.position = "bottom"
   )
-
-dev.off()
 ```
 
 **5.Wpływ roku produkcji na cenę**
@@ -744,10 +742,9 @@ dev.off()
 
 📊 Wizualizacja: Wykres rozrzutu pokazujący wzrost cen wraz z nowszym rokiem produkcji.
 
-```{r, message=FALSE, warning=FALSE}
-# Upewnij się, że year i price_in_pln są liczbami
-dane$year <- as.numeric(dane$year)  # Konwertowanie 'year' na liczbę
-dane$price_in_pln <- as.numeric(dane$price_in_pln)  # Konwertowanie 'price_in_pln' na liczbę
+```{r message=FALSE, warning=FALSE, echo = FALSE}
+dane$year <- as.numeric(dane$year) 
+dane$price_in_pln <- as.numeric(dane$price_in_pln)
 
 # Teraz uruchom ggscatterstats
 library(ggstatsplot)
