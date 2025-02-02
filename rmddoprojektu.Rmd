@@ -263,7 +263,7 @@ Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 
 ## 2 Wizualizacja danych {style="color:green"}
 
-### 2.1 Wykresy kołowee
+### 2.1 
 
 ```{r}
 # przekształcenie
