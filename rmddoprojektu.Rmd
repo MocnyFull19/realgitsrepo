@@ -460,11 +460,18 @@ W tej sekcji przeanalizujemy podstawowe miary statystyczne, takie jak średnia, 
 Ponadto, zbadamy istniejące korelacje między zmiennymi numerycznymi i sprawdzimy jakie mają wpływ na cenę samochodu.
 
 ```{r, include=FALSE}
+# Ustawienie serwera CRAN bez interakcji
+options(repos = c(CRAN = "https://cran.rstudio.com"))
+
+# Instalacja pakietu
+install.packages("summarytools")
+library(summarytools)
+
 # Podsumowanie danych
 summary_stats <- dfSummary(dane)
 print(summary_stats)
 
-#HTML
+# HTML
 print(summary_stats, method = "browser", file = "report.html")
 ```
 
@@ -475,6 +482,24 @@ Rozstęp międzykwartylowy (IQR), czyli różnica między trzecim a pierwszym kw
 Współczynnik zmienności (CV), obliczony jako stosunek odchylenia standardowego do średniej, wynosi **1,3** (130%), co dodatkowo podkreśla znaczną rozbieżność cen w analizie.
 
 ```{r, include=FALSE}
+install.packages("GGally")
+install.packages("summarytools")
+install.packages("dplyr")
+install.packages("psych")
+install.packages("summarytools")
+install.packages("flextable")
+install.packages("writexl")
+install.packages("kableExtra")
+library(writexl)
+library(flextable)
+library(summarytools)
+library(ggplot2)
+library(GGally)
+library(dplyr)
+library(psych)
+library(summarytools)
+library(kableExtra)
+
 ggcorr(
   data = dane %>% select(where(is.numeric)),
   method = c("pairwise.complete.obs" , "pearson"),
@@ -715,6 +740,13 @@ dev.off()
 📊 Wizualizacja: Wykres rozrzutu pokazujący wzrost cen wraz z nowszym rokiem produkcji.
 
 ```{r, message=FALSE, warning=FALSE}
+# Upewnij się, że year i price_in_pln są liczbami
+dane$year <- as.numeric(dane$year)  # Konwertowanie 'year' na liczbę
+dane$price_in_pln <- as.numeric(dane$price_in_pln)  # Konwertowanie 'price_in_pln' na liczbę
+
+# Teraz uruchom ggscatterstats
+library(ggstatsplot)
+
 ggscatterstats(
   data = dane,
   x = year,
