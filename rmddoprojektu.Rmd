@@ -261,9 +261,10 @@ vis_miss(samochody_dowiz, warn_large_data = FALSE)
 
 Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 
+
 ## 2 Wizualizacja danych {style="color:green"}
 
-### 2.1
+**Wizualizacja danych** to kluczowy proces w analizie danych, który pozwala na skuteczne przedstawienie informacji w formie graficznej. Dzięki odpowiednim wykresom i diagramom, możemy w łatwy sposób zobaczyć wzorce, zależności i trendy, które mogą być trudne do uchwycenia w surowych danych liczbowych. Celem wizualizacji jest uczynienie danych bardziej przystępnymi i zrozumiałymi, zarówno dla specjalistów, jak i osób nieznających się na analizie danych.
 
 ```{r,include=FALSE}
 # przekształcenie
@@ -286,6 +287,53 @@ samochody_top_5_brands <- dane %>%
   filter(brand %in% top_5_brands)
 ```
 
+### 2.1. Wykresy zmiennej ilościowej
+
+**Wykres liniowy (line plot) - Trend cen samochodów w zależności od roku produkcji**
+
+```{r,echo=FALSE}
+#Wykres liniowy (line plot) - Trend cen samochodów w zależności od roku produkcji
+dane %>%
+  group_by(year) %>%
+  summarise(mean_price = mean(price_in_pln, na.rm = TRUE)) %>%
+  ggplot(aes(x = year, y = mean_price)) +
+  geom_line(color = "blue") +
+  geom_point(color = "red") +
+  theme_minimal() +
+  labs(
+    title = "Trend cen samochodów w zależności od roku produkcji",
+    x = "Rok produkcji",
+    y = "Średnia cena (PLN)"
+  )
+```
+
+Średnia cena samochodów jest najwyższa dla nowych modeli, ale ciekawe jest to, że samochody z 1999 roku bywają droższe od tych z 1998 czy 1997 🤔.
+
+**Wykres średniej ceny w zależności od rodzaju paliwa**
+
+```{r,echo=FALSE}
+# Wykres średniej ceny w zależności od rodzaju paliwa
+dane %>%
+  group_by(fuel_type) %>%
+  summarise(mean_price = mean(price_in_pln, na.rm = TRUE)) %>%
+  ggplot(aes(x = fuel_type, y = mean_price, fill = fuel_type)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(
+    title = "Średnia cena samochodów w zależności od rodzaju paliwa",
+    x = "Rodzaj paliwa",
+    y = "Średnia cena (PLN)"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(palette = "Set3")
+```
+
+Najdroższe są samochody elektryczne, które zyskują na popularności z powodu rosnącego zainteresowania ekologicznymi i nowoczesnymi technologiami. Wysoka cena tych pojazdów wynika z kosztów baterii, zaawansowanej technologii oraz innowacyjnych rozwiązań, które zapewniają ich dużą wydajność i zasięg. Oprócz elektrycznych, drogie są także pojazdy hybrydowe, które łączą napęd spalinowy z elektrycznym, oferując większą oszczędność paliwa i mniejsze emisje spalin 🌱🚗.
+
+### 2.2 Wykresy zmiennej jakościowej
+
+**Wykres kołowy - Typ paliwa, liczba samochodów w zależności od roku produkcji**
+
 ```{r,echo=FALSE}
 # Wykres kołowy- typ paliwa
 fuel_count <- dane %>%
@@ -299,26 +347,33 @@ ggplot(fuel_count, aes(x = "", y = n, fill = fuel_type)) +
   theme(axis.text.x = element_blank())
 ```
 
-Wykres pokazuje procentowy udział paliw w samochodach.
-**Benzyna i Diesel dominują**, podczas gdy **paliwa alternatywne (LPG, CNG, elektryczne, hybrydy) mają niewielki udział**.
-🚗💨
+Wykres pokazuje procentowy udział paliw w samochodach. **Benzyna i Diesel dominują**, podczas gdy **paliwa alternatywne (LPG, CNG, elektryczne, hybrydy) mają niewielki udział**. 🚗💨
+
+**Top 10 najczęstszych marek samochodów**
 
 ```{r,echo=FALSE}
-# Wykres liczby samochodów w zależności od roku produkcji
+#Top 10 najczęstszych marek samochodów
 dane %>%
-  ggplot(aes(x = year)) +
-  geom_bar(fill = "steelblue") +
+  count(brand) %>%
+  arrange(desc(n)) %>%
+  top_n(10, n) %>%
+  ggplot(aes(x = reorder(brand, -n), y = n, fill = brand)) +
+  geom_bar(stat = "identity") +
   theme_minimal() +
   labs(
-    title = "Liczba samochodów w zależności od roku produkcji",
-    x = "Rok produkcji",
-    y = "Liczba samochodów"
-  )
+    title = "Top 10 najczęstszych marek samochodów",
+    x = "Marka",
+    y = "Liczba wystąpień"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_fill_brewer(palette = "Set3")
 ```
 
-Wykres pokazuje liczbę samochodów według roku produkcji.
-**Najwięcej aut pochodzi z ostatnich kilkunastu lat**, a produkcja wzrosła po 2000 r., osiągając szczyt ok. 2018 r.
-📈🚗
+Z analizowanego wykresu dotyczącego najczęściej rejestrowanych marek samochodów w Polsce wynika, że **Volkswagen** zajmuje pierwsze miejsce, z liczbą rejestracji przekraczającą 10 000 sztuk, co czyni go jedyną marką w tej czołówce, której wynik wyraźnie przekracza tę granicę. Obok Volkswagena, w zestawieniu znalazły się takie marki jak **Opel** i **BMW**, które również cieszą się dużą popularnością na polskim rynku motoryzacyjnym.
+
+### 2.3 Wykresy dwóch zmiennych jakościowych
+
+**Wykresy dwóch zmiennych jakościowych**
 
 ```{r,echo=FALSE}
 # Wykres liczby samochodów(rodzaju paliwa) w zależności od wojewodztwa
@@ -339,70 +394,28 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 ```
 
-Wykres pokazuje liczbę samochodów według rodzaju paliwa w województwach.
-**Benzyna i Diesel dominują**, szczególnie w Mazowieckim, Śląskim i Wielkopolskim.
-Paliwa alternatywne (LPG, CNG, hybrydy, elektryczne) stanowią niewielki udział.
-🚗🔋
+Wykres pokazuje liczbę samochodów według rodzaju paliwa w województwach. **Benzyna i Diesel dominują**, szczególnie w Mazowieckim, Śląskim i Wielkopolskim. Paliwa alternatywne (LPG, CNG, hybrydy, elektryczne) stanowią niewielki udział. 🚗🔋
+
+### 2.4 Wykresy dwóch zmiennych ilościowych
+
+**Wykres liczby samochodów (rodzaju paliwa) w zależności od województwa**
 
 ```{r,echo=FALSE}
-#Wykres liniowy (line plot) - Trend cen samochodów w zależności od roku produkcji
+# Wykres liczby samochodów w zależności od roku produkcji
 dane %>%
-  group_by(year) %>%
-  summarise(mean_price = mean(price_in_pln, na.rm = TRUE)) %>%
-  ggplot(aes(x = year, y = mean_price)) +
-  geom_line(color = "blue") +
-  geom_point(color = "red") +
+  ggplot(aes(x = year)) +
+  geom_bar(fill = "steelblue") +
   theme_minimal() +
   labs(
-    title = "Trend cen samochodów w zależności od roku produkcji",
+    title = "Liczba samochodów w zależności od roku produkcji",
     x = "Rok produkcji",
-    y = "Średnia cena (PLN)"
+    y = "Liczba samochodów"
   )
 ```
 
-Średnia cena samochodów jest najwyższa dla nowych modeli, ale ciekawe jest to, że samochody z 1999 roku bywają droższe od tych z 1998 czy 1997 🤔.
+Wykres pokazuje liczbę samochodów według roku produkcji. **Najwięcej aut pochodzi z ostatnich kilkunastu lat**, a produkcja wzrosła po 2000 r., osiągając szczyt ok. 2018 r. 📈🚗
 
-```{r,echo=FALSE}
-# Wykres średniej ceny w zależności od rodzaju paliwa
-dane %>%
-  group_by(fuel_type) %>%
-  summarise(mean_price = mean(price_in_pln, na.rm = TRUE)) %>%
-  ggplot(aes(x = fuel_type, y = mean_price, fill = fuel_type)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  labs(
-    title = "Średnia cena samochodów w zależności od rodzaju paliwa",
-    x = "Rodzaj paliwa",
-    y = "Średnia cena (PLN)"
-  ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_brewer(palette = "Set3")
-```
-
-Najdroższe są samochody elektryczne, które zyskują na popularności z powodu rosnącego zainteresowania ekologicznymi i nowoczesnymi technologiami.
-Wysoka cena tych pojazdów wynika z kosztów baterii, zaawansowanej technologii oraz innowacyjnych rozwiązań, które zapewniają ich dużą wydajność i zasięg.
-Oprócz elektrycznych, drogie są także pojazdy hybrydowe, które łączą napęd spalinowy z elektrycznym, oferując większą oszczędność paliwa i mniejsze emisje spalin 🌱🚗.
-
-```{r,echo=FALSE}
-#Top 10 najczęstszych marek samochodów
-dane %>%
-  count(brand) %>%
-  arrange(desc(n)) %>%
-  top_n(10, n) %>%
-  ggplot(aes(x = reorder(brand, -n), y = n, fill = brand)) +
-  geom_bar(stat = "identity") +
-  theme_minimal() +
-  labs(
-    title = "Top 10 najczęstszych marek samochodów",
-    x = "Marka",
-    y = "Liczba wystąpień"
-  ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_brewer(palette = "Set3")
-```
-
-Z analizowanego wykresu dotyczącego najczęściej rejestrowanych marek samochodów w Polsce wynika, że **Volkswagen** zajmuje pierwsze miejsce, z liczbą rejestracji przekraczającą 10 000 sztuk, co czyni go jedyną marką w tej czołówce, której wynik wyraźnie przekracza tę granicę.
-Obok Volkswagena, w zestawieniu znalazły się takie marki jak **Opel** i **BMW**, które również cieszą się dużą popularnością na polskim rynku motoryzacyjnym.
+**Wykres cena vs przebieg w zaleznosci od roku produkcji**
 
 ```{r,echo=FALSE}
 # Wykres cena vs przebieg w zaleznosci od roku produkcji
@@ -432,34 +445,9 @@ ggplot(dane_avg, aes(x = avg_mileage, y = avg_price_in_pln, color = year_group))
   theme(legend.title = element_blank())
 ```
 
-Cena samochodu w zależności od przebiegu i rocznika pokazuje wyraźną zależność między wiekiem pojazdu a jego wartością rynkową.
-Zwykle najdroższe są samochody nowe lub z niewielkim przebiegiem, ponieważ są wciąż objęte gwarancją, oferują nowoczesne technologie, mają mniejsze zużycie części i są bardziej efektywne pod względem paliwowym.
-Takie auta zazwyczaj utrzymują swoją wartość na rynku przez dłuższy czas.
+Cena samochodu w zależności od przebiegu i rocznika pokazuje wyraźną zależność między wiekiem pojazdu a jego wartością rynkową. Zwykle najdroższe są samochody nowe lub z niewielkim przebiegiem, ponieważ są wciąż objęte gwarancją, oferują nowoczesne technologie, mają mniejsze zużycie części i są bardziej efektywne pod względem paliwowym. Takie auta zazwyczaj utrzymują swoją wartość na rynku przez dłuższy czas.
 
-```{r,echo=FALSE}
-# Wykres średniej ceny i przebiegu w zależności od marki samochodu i grupy lat produkcji
-samochody_top_5_brands$year_group <- cut(samochody_top_5_brands$year,
-                                         breaks = c(1995, 2000, 2005, 2010, 2015, 2020, 2023),
-                                         labels = c("1995-2000", "2001-2005", "2006-2010", "2011-2015", "2016-2020", "2021-2023"),
-                                         right = TRUE)
 
-samochody_avg_top_5_year <- samochody_top_5_brands %>%
-  group_by(brand, year_group) %>%
-  summarise(
-    avg_mileage = mean(mileage, na.rm = TRUE),
-    avg_price_in_pln = mean(price_in_pln, na.rm = TRUE)
-  )
-
-ggplot(samochody_avg_top_5_year, aes(x = avg_mileage, y = avg_price_in_pln, color = brand, shape = year_group)) +
-  geom_point(size = 3, alpha = 0.7) +
-  labs(title = "Średnia cena vs. Przebieg dla 5 najczęściej występujących marek (z podziałem na lata produkcji)", 
-       x = "Średni przebieg (km)", 
-       y = "Średnia cena (PLN)", 
-       color = "Marka samochodu",
-       shape = "Grupa lat produkcji") +
-  theme_minimal() +
-  theme(legend.title = element_blank())
-```
 
 ## 3 Analiza opisowa {style="color:green"}
 
