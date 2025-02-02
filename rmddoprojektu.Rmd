@@ -263,9 +263,9 @@ Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 
 ## 2 Wizualizacja danych {style="color:green"}
 
-### 2.1 
+### 2.1
 
-```{r}
+```{r,include=FALSE}
 # przekształcenie
 dane <- samochody_dowiz %>%
   mutate(
@@ -299,6 +299,10 @@ ggplot(fuel_count, aes(x = "", y = n, fill = fuel_type)) +
   theme(axis.text.x = element_blank())
 ```
 
+Wykres pokazuje procentowy udział paliw w samochodach.
+**Benzyna i Diesel dominują**, podczas gdy **paliwa alternatywne (LPG, CNG, elektryczne, hybrydy) mają niewielki udział**.
+🚗💨
+
 ```{r,echo=FALSE}
 # Wykres liczby samochodów w zależności od roku produkcji
 dane %>%
@@ -311,6 +315,10 @@ dane %>%
     y = "Liczba samochodów"
   )
 ```
+
+Wykres pokazuje liczbę samochodów według roku produkcji.
+**Najwięcej aut pochodzi z ostatnich kilkunastu lat**, a produkcja wzrosła po 2000 r., osiągając szczyt ok. 2018 r.
+📈🚗
 
 ```{r,echo=FALSE}
 # Wykres liczby samochodów(rodzaju paliwa) w zależności od wojewodztwa
@@ -331,6 +339,11 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 ```
 
+Wykres pokazuje liczbę samochodów według rodzaju paliwa w województwach.
+**Benzyna i Diesel dominują**, szczególnie w Mazowieckim, Śląskim i Wielkopolskim.
+Paliwa alternatywne (LPG, CNG, hybrydy, elektryczne) stanowią niewielki udział.
+🚗🔋
+
 ```{r,echo=FALSE}
 #Wykres liniowy (line plot) - Trend cen samochodów w zależności od roku produkcji
 dane %>%
@@ -346,6 +359,8 @@ dane %>%
     y = "Średnia cena (PLN)"
   )
 ```
+
+Średnia cena samochodów jest najwyższa dla nowych modeli, ale ciekawe jest to, że samochody z 1999 roku bywają droższe od tych z 1998 czy 1997 🤔.
 
 ```{r,echo=FALSE}
 # Wykres średniej ceny w zależności od rodzaju paliwa
@@ -364,6 +379,10 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 ```
 
+Najdroższe są samochody elektryczne, które zyskują na popularności z powodu rosnącego zainteresowania ekologicznymi i nowoczesnymi technologiami.
+Wysoka cena tych pojazdów wynika z kosztów baterii, zaawansowanej technologii oraz innowacyjnych rozwiązań, które zapewniają ich dużą wydajność i zasięg.
+Oprócz elektrycznych, drogie są także pojazdy hybrydowe, które łączą napęd spalinowy z elektrycznym, oferując większą oszczędność paliwa i mniejsze emisje spalin 🌱🚗.
+
 ```{r,echo=FALSE}
 #Top 10 najczęstszych marek samochodów
 dane %>%
@@ -381,6 +400,9 @@ dane %>%
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_fill_brewer(palette = "Set3")
 ```
+
+Z analizowanego wykresu dotyczącego najczęściej rejestrowanych marek samochodów w Polsce wynika, że **Volkswagen** zajmuje pierwsze miejsce, z liczbą rejestracji przekraczającą 10 000 sztuk, co czyni go jedyną marką w tej czołówce, której wynik wyraźnie przekracza tę granicę.
+Obok Volkswagena, w zestawieniu znalazły się takie marki jak **Opel** i **BMW**, które również cieszą się dużą popularnością na polskim rynku motoryzacyjnym.
 
 ```{r,echo=FALSE}
 # Wykres cena vs przebieg w zaleznosci od roku produkcji
@@ -410,6 +432,10 @@ ggplot(dane_avg, aes(x = avg_mileage, y = avg_price_in_pln, color = year_group))
   theme(legend.title = element_blank())
 ```
 
+Cena samochodu w zależności od przebiegu i rocznika pokazuje wyraźną zależność między wiekiem pojazdu a jego wartością rynkową.
+Zwykle najdroższe są samochody nowe lub z niewielkim przebiegiem, ponieważ są wciąż objęte gwarancją, oferują nowoczesne technologie, mają mniejsze zużycie części i są bardziej efektywne pod względem paliwowym.
+Takie auta zazwyczaj utrzymują swoją wartość na rynku przez dłuższy czas.
+
 ```{r,echo=FALSE}
 # Wykres średniej ceny i przebiegu w zależności od marki samochodu i grupy lat produkcji
 samochody_top_5_brands$year_group <- cut(samochody_top_5_brands$year,
@@ -436,6 +462,84 @@ ggplot(samochody_avg_top_5_year, aes(x = avg_mileage, y = avg_price_in_pln, colo
 ```
 
 ## 3 Analiza opisowa {style="color:green"}
+
+```{r, include=FALSE}
+# Podsumowanie danych
+summary_stats <- dfSummary(dane)
+print(summary_stats)
+
+#HTML
+print(summary_stats, method = "browser", file = "report.html")
+
+
+ggcorr(
+  data = dane %>% select(where(is.numeric)),
+  method = c("pairwise.complete.obs" , "pearson"),
+  label = TRUE
+) +
+  theme(
+    axis.text.x = element_text(hjust = 1), 
+    axis.text.y = element_text(hjust = 1)
+  )
+
+var(dane$price_in_pln) #variance
+coeff_var<-sd(dane$price_in_pln)/mean(dane$price_in_pln) #coefficient of variability %
+coeff_var
+IQR(dane$price_in_pln)# difference between quartiles =Q3-Q1 
+sx<-IQR(dane$price_in_pln)/2  #interquartile deviation
+coeff_varx<-sx/median(dane$price_in_pln) #IQR coefficient of variability %
+coeff_varx
+min(dane$price_in_pln)
+max(dane$price_in_pln)
+quantile(dane$price_in_pln,probs=c(0,0.1,0.25,0.5,0.75,0.95,1),na.rm=TRUE)
+
+# Grupowanie danych po 'brand' i obliczanie statystyk dla każdej grupy
+library(dplyr)
+
+analiza_df <- dane %>%
+  group_by(brand) %>%
+  summarise(
+    Min = min(price_in_pln, na.rm = TRUE),
+    Max = max(price_in_pln, na.rm = TRUE),
+    `Kwartyl dolny` = quantile(price_in_pln, 0.25, na.rm = TRUE),
+    Mediana = round(median(price_in_pln, na.rm = TRUE), 2),
+    `Kwartyl górny` = quantile(price_in_pln, 0.75, na.rm = TRUE),
+    Średnia = round(mean(price_in_pln, na.rm = TRUE), 2),
+    `Odch. std.` = round(sd(price_in_pln, na.rm = TRUE), 2),
+    IQR = round(IQR(price_in_pln, na.rm = TRUE), 2),
+    `Odchylenie ćwiartkowe` = round(IQR(price_in_pln, na.rm = TRUE) / 2, 2),
+    `Skośność` = round(skew(price_in_pln, na.rm = TRUE), 2),
+    `Kurtoza` = round(kurtosi(price_in_pln, na.rm = TRUE), 2),
+    .groups = "drop"
+  )
+
+ogolne_podsumowanie <- dane %>%
+  summarise(
+    brand = "Ogólnie",
+    Min = min(price_in_pln, na.rm = TRUE),
+    Max = max(price_in_pln, na.rm = TRUE),
+    `Kwartyl dolny` = quantile(price_in_pln, 0.25, na.rm = TRUE),
+    Mediana = round(median(price_in_pln, na.rm = TRUE), 2),
+    `Kwartyl górny` = quantile(price_in_pln, 0.75, na.rm = TRUE),
+    Średnia = round(mean(price_in_pln, na.rm = TRUE), 2),
+    `Odch. std.` = round(sd(price_in_pln, na.rm = TRUE), 2),
+    IQR = round(IQR(price_in_pln, na.rm = TRUE), 2),
+    `Odchylenie ćwiartkowe` = round(IQR(price_in_pln, na.rm = TRUE) / 2, 2),
+    `Skośność` = round(skew(price_in_pln, na.rm = TRUE), 2),
+    `Kurtoza` = round(kurtosi(price_in_pln, na.rm = TRUE), 2)
+  )
+
+pelna_tabela <- bind_rows(ogolne_podsumowanie, analiza_df)
+
+kable(pelna_tabela, 
+      col.names = c("Marka", "Min", "Max", "Kwartyl dolny", "Mediana", 
+                    "Kwartyl górny", "Średnia", "Odch. std.", "IQR", 
+                    "Odchylenie ćwiartkowe", "Skośność", "Kurtoza"),
+      caption = "Podsumowanie cen samochodów według marki (w tym ogólnie)")
+
+write_xlsx(pelna_tabela, "podsumowanie_cen_samochodow_z_ogolem.xlsx")
+
+```
 
 ## 4 Wnioskowanie statystyczne {style="color:green"}
 
