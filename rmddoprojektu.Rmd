@@ -150,14 +150,8 @@ fix_year_and_mileage <- function(data) {
 # Zastosuj funkcję do swojego zbioru danych
 samochody_new <- fix_year_and_mileage(samochody_new)
 
-# Zapisz zmodyfikowane dane do pliku
-write.csv(samochody_new, "pozmianach1.csv", row.names = FALSE)
-
-# Wczytanie danych po zmianach
-samochody_01 <- read_csv("pozmianach1.csv")
-
 # Wizualizacja brakujących danych
-vis_miss(samochody_01, warn_large_data = FALSE)
+vis_miss(samochody_new, warn_large_data = FALSE)
 ```
 
 ### 1.4 Imputowanie wartości dla brakujących lub błędnych danych
@@ -180,46 +174,46 @@ library(mice)
 
 ```{r,message=FALSE, warning=FALSE}
 #Imputacja braków danych za pomocą funkcji mice 
-imputed_data <- mice(samochody_01, method = "pmm", m = 5, maxit = 10, seed = 123)
+imputed_data <- mice(samochody_new, method = "pmm", m = 5, maxit = 10, seed = 123)
 
 # Pobranie pierwszego uzupełnionego zbioru danych
-samochody_01_imputed <- complete(imputed_data, 1)
+samochody_new_imputed <- complete(imputed_data, 1)
 
 # Nadpisanie kolumny year w oryginalnym zbiorze
-samochody_01$year <- samochody_01_imputed$year 
+samochody_new$year <- samochody_new_imputed$year 
 
 # Sprawdzenie czy braki zostały uzupełnione
-vis_miss(samochody_01, warn_large_data = FALSE)
+vis_miss(samochody_new, warn_large_data = FALSE)
 
 # Zastąpienie NA w kolumnie fuel_type
-samochody_01$fuel_type <- ifelse(
-  is.na(samochody_01$fuel_type) & samochody_01$engine_capacity == "Elektryczny",
+samochody_new$fuel_type <- ifelse(
+  is.na(samochody_new$fuel_type) & samochody_new$engine_capacity == "Elektryczny",
   "Elektryczny",
-  samochody_01$fuel_type
+  samochody_new$fuel_type
 )
 # efekty zastąpienia NA w elektrycznych autach
-vis_miss(samochody_01, warn_large_data = FALSE)
+vis_miss(samochody_new, warn_large_data = FALSE)
 # eliminowanie NA w hybrydach
-samochody_01$fuel_type <- ifelse(
-  is.na(samochody_01$fuel_type) & samochody_01$engine_capacity == "Hybryda",
+samochody_new$fuel_type <- ifelse(
+  is.na(samochody_new$fuel_type) & samochody_new$engine_capacity == "Hybryda",
   "Hybryda",
-  samochody_01$fuel_type
+  samochody_new$fuel_type
 )
-vis_miss(samochody_01, warn_large_data = FALSE)
+vis_miss(samochody_new, warn_large_data = FALSE)
 
 
-samochody_01$engine_capacity <- trimws(tolower(samochody_01$engine_capacity))
+samochody_new$engine_capacity <- trimws(tolower(samochody_new$engine_capacity))
 
 # Zastąpienie braków w fuel_type
-samochody_01$fuel_type <- ifelse(
-  is.na(samochody_01$fuel_type) & samochody_01$engine_capacity == "elektryczny",
+samochody_new$fuel_type <- ifelse(
+  is.na(samochody_new$fuel_type) & samochody_new$engine_capacity == "elektryczny",
   "Elektryczne",
-  samochody_01$fuel_type
+  samochody_new$fuel_type
 )
-table(is.na(samochody_01$fuel_type))
+table(is.na(samochody_new$fuel_type))
 ##
 # Wyodrębnienie kolumn fuel_type i brand
-samochody_fuel_brand <- samochody_01[, c("fuel_type", "brand"), drop = FALSE]
+samochody_fuel_brand <- samochody_new[, c("fuel_type", "brand"), drop = FALSE]
 ```
 
 ```{r, include=FALSE}
@@ -231,25 +225,25 @@ imputed_data <- mice(samochody_fuel_brand, method = c("polyreg", "polyreg"), m =
 # Uzyskanie pierwszej imputacji
 fuel_brand_imputed <- complete(imputed_data, 1)
 
-# Zaktualizowanie oryginalnych kolumn fuel_type i brand w samochody_01
-samochody_01$fuel_type <- fuel_brand_imputed$fuel_type
-samochody_01$brand <- fuel_brand_imputed$brand
+# Zaktualizowanie oryginalnych kolumn fuel_type i brand w samochody_new
+samochody_new$fuel_type <- fuel_brand_imputed$fuel_type
+samochody_new$brand <- fuel_brand_imputed$brand
 
-vis_miss(samochody_01, warn_large_data = FALSE)
+vis_miss(samochody_new, warn_large_data = FALSE)
 ```
 
-## 1.5 Oczyszcenie danych z dalszych brakujących wartości
+### 1.5 Oczyszcenie danych z dalszych brakujących wartości
 
 ```{r}
 # Usunięcie wierszy z NA w kolumnie 'fuel_type'
-samochody_01_cleaned <- samochody_01[!is.na(samochody_01$fuel_type), ]
+samochody_new_cleaned <- samochody_new[!is.na(samochody_new$fuel_type), ]
 
 # Wyświetlenie oczyszczonej ramki danych
-print(samochody_01_cleaned)
-vis_miss(samochody_01_cleaned, warn_large_data = FALSE)
+print(samochody_new_cleaned)
+vis_miss(samochody_new_cleaned, warn_large_data = FALSE)
 
 #decyzja o usunięciu obserwacji z NA 
-samochody_dowiz <- samochody_01[complete.cases(samochody_01), ]
+samochody_dowiz <- samochody_new[complete.cases(samochody_new), ]
 ```
 
 Wynikiem jest poniższa tabela z danymi po oczyszczeniu z brakujących wartości:
@@ -261,10 +255,11 @@ vis_miss(samochody_dowiz, warn_large_data = FALSE)
 
 Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 
-
 ## 2 Wizualizacja danych {style="color:green"}
 
-**Wizualizacja danych** to kluczowy proces w analizie danych, który pozwala na skuteczne przedstawienie informacji w formie graficznej. Dzięki odpowiednim wykresom i diagramom, możemy w łatwy sposób zobaczyć wzorce, zależności i trendy, które mogą być trudne do uchwycenia w surowych danych liczbowych. Celem wizualizacji jest uczynienie danych bardziej przystępnymi i zrozumiałymi, zarówno dla specjalistów, jak i osób nieznających się na analizie danych.
+**Wizualizacja danych** to kluczowy proces w analizie danych, który pozwala na skuteczne przedstawienie informacji w formie graficznej.
+Dzięki odpowiednim wykresom i diagramom, możemy w łatwy sposób zobaczyć wzorce, zależności i trendy, które mogą być trudne do uchwycenia w surowych danych liczbowych.
+Celem wizualizacji jest uczynienie danych bardziej przystępnymi i zrozumiałymi, zarówno dla specjalistów, jak i osób nieznających się na analizie danych.
 
 ```{r,include=FALSE}
 # przekształcenie
@@ -328,7 +323,9 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 ```
 
-Najdroższe są samochody elektryczne, które zyskują na popularności z powodu rosnącego zainteresowania ekologicznymi i nowoczesnymi technologiami. Wysoka cena tych pojazdów wynika z kosztów baterii, zaawansowanej technologii oraz innowacyjnych rozwiązań, które zapewniają ich dużą wydajność i zasięg. Oprócz elektrycznych, drogie są także pojazdy hybrydowe, które łączą napęd spalinowy z elektrycznym, oferując większą oszczędność paliwa i mniejsze emisje spalin 🌱🚗.
+Najdroższe są samochody elektryczne, które zyskują na popularności z powodu rosnącego zainteresowania ekologicznymi i nowoczesnymi technologiami.
+Wysoka cena tych pojazdów wynika z kosztów baterii, zaawansowanej technologii oraz innowacyjnych rozwiązań, które zapewniają ich dużą wydajność i zasięg.
+Oprócz elektrycznych, drogie są także pojazdy hybrydowe, które łączą napęd spalinowy z elektrycznym, oferując większą oszczędność paliwa i mniejsze emisje spalin 🌱🚗.
 
 ### 2.2 Wykresy zmiennej jakościowej
 
@@ -347,7 +344,9 @@ ggplot(fuel_count, aes(x = "", y = n, fill = fuel_type)) +
   theme(axis.text.x = element_blank())
 ```
 
-Wykres pokazuje procentowy udział paliw w samochodach. **Benzyna i Diesel dominują**, podczas gdy **paliwa alternatywne (LPG, CNG, elektryczne, hybrydy) mają niewielki udział**. 🚗💨
+Wykres pokazuje procentowy udział paliw w samochodach.
+**Benzyna i Diesel dominują**, podczas gdy **paliwa alternatywne (LPG, CNG, elektryczne, hybrydy) mają niewielki udział**.
+🚗💨
 
 **Top 10 najczęstszych marek samochodów**
 
@@ -369,7 +368,8 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 ```
 
-Z analizowanego wykresu dotyczącego najczęściej rejestrowanych marek samochodów w Polsce wynika, że **Volkswagen** zajmuje pierwsze miejsce, z liczbą rejestracji przekraczającą 10 000 sztuk, co czyni go jedyną marką w tej czołówce, której wynik wyraźnie przekracza tę granicę. Obok Volkswagena, w zestawieniu znalazły się takie marki jak **Opel** i **BMW**, które również cieszą się dużą popularnością na polskim rynku motoryzacyjnym.
+Z analizowanego wykresu dotyczącego najczęściej rejestrowanych marek samochodów w Polsce wynika, że **Volkswagen** zajmuje pierwsze miejsce, z liczbą rejestracji przekraczającą 10 000 sztuk, co czyni go jedyną marką w tej czołówce, której wynik wyraźnie przekracza tę granicę.
+Obok Volkswagena, w zestawieniu znalazły się takie marki jak **Opel** i **BMW**, które również cieszą się dużą popularnością na polskim rynku motoryzacyjnym.
 
 ### 2.3 Wykresy dwóch zmiennych jakościowych
 
@@ -394,7 +394,10 @@ dane %>%
   scale_fill_brewer(palette = "Set3")
 ```
 
-Wykres pokazuje liczbę samochodów według rodzaju paliwa w województwach. **Benzyna i Diesel dominują**, szczególnie w Mazowieckim, Śląskim i Wielkopolskim. Paliwa alternatywne (LPG, CNG, hybrydy, elektryczne) stanowią niewielki udział. 🚗🔋
+Wykres pokazuje liczbę samochodów według rodzaju paliwa w województwach.
+**Benzyna i Diesel dominują**, szczególnie w Mazowieckim, Śląskim i Wielkopolskim.
+Paliwa alternatywne (LPG, CNG, hybrydy, elektryczne) stanowią niewielki udział.
+🚗🔋
 
 ### 2.4 Wykresy dwóch zmiennych ilościowych
 
@@ -413,7 +416,9 @@ dane %>%
   )
 ```
 
-Wykres pokazuje liczbę samochodów według roku produkcji. **Najwięcej aut pochodzi z ostatnich kilkunastu lat**, a produkcja wzrosła po 2000 r., osiągając szczyt ok. 2018 r. 📈🚗
+Wykres pokazuje liczbę samochodów według roku produkcji.
+**Najwięcej aut pochodzi z ostatnich kilkunastu lat**, a produkcja wzrosła po 2000 r., osiągając szczyt ok. 2018 r.
+📈🚗
 
 **Wykres cena vs przebieg w zaleznosci od roku produkcji**
 
@@ -445,9 +450,9 @@ ggplot(dane_avg, aes(x = avg_mileage, y = avg_price_in_pln, color = year_group))
   theme(legend.title = element_blank())
 ```
 
-Cena samochodu w zależności od przebiegu i rocznika pokazuje wyraźną zależność między wiekiem pojazdu a jego wartością rynkową. Zwykle najdroższe są samochody nowe lub z niewielkim przebiegiem, ponieważ są wciąż objęte gwarancją, oferują nowoczesne technologie, mają mniejsze zużycie części i są bardziej efektywne pod względem paliwowym. Takie auta zazwyczaj utrzymują swoją wartość na rynku przez dłuższy czas.
-
-
+Cena samochodu w zależności od przebiegu i rocznika pokazuje wyraźną zależność między wiekiem pojazdu a jego wartością rynkową.
+Zwykle najdroższe są samochody nowe lub z niewielkim przebiegiem, ponieważ są wciąż objęte gwarancją, oferują nowoczesne technologie, mają mniejsze zużycie części i są bardziej efektywne pod względem paliwowym.
+Takie auta zazwyczaj utrzymują swoją wartość na rynku przez dłuższy czas.
 
 ## 3 Analiza opisowa {style="color:green"}
 
