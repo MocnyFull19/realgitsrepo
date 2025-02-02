@@ -730,9 +730,18 @@ ggscatterstats(
 
 ### 5. Podsumowanie
 
-Analiza wykazała, że: ✅ Rodzaj paliwa, marka oraz rok produkcji znacząco wpływają na cenę samochodu.
-✅ Przebieg ma odwrotny wpływ – im większy, tym niższa cena.
-✅ Rozkład cen jest asymetryczny, co wymaga stosowania testów nieparametrycznych.
+📌 **Trendy cenowe i wpływ roku produkcji:**
 
-Wyniki tej analizy mogą pomóc w lepszym zrozumieniu rynku samochodowego i optymalizacji strategii zakupu lub sprzedaży pojazdów.
-🚗📊 ##5 Podsumowanie i wnioski końcowe
+-   Analiza cen samochodów w zależności od roku produkcji ujawnia wyraźny trend wzrostu cen wśród nowszych modeli.
+    Najdroższe samochody to te produkowane w ostatnich latach, co jest naturalne ze względu na technologię, nowoczesność oraz gwarancje związane z nowymi pojazdami.
+
+-   Interesującym zjawiskiem jest jednak wyższa cena samochodów z 1999 roku w porównaniu do niektórych modeli z lat 1997 czy 1998, co może wynikać z unikalnych cech, poszukiwanych modeli lub niskiej dostępności tych aut na rynku wtórnym.
+
+📌 **Rodzaj paliwa a cena samochodów -** samochody elektryczne oraz hybrydowe są najdroższe spośród analizowanych typów paliwa, co wynika z kosztów zaawansowanej technologii (np. kosztów baterii w przypadku samochodów elektrycznych) oraz rosnącego zainteresowania ekologicznymi rozwiązaniami.
+
+📌 **Podział rynku według marek:**
+
+-   Z analizy wynika, że najbardziej popularne marki to Volkswagen, Opel, i BMW, z czego Volkswagen jest zdecydowanym liderem na rynku samochodów używanych w Polsce, przekraczając liczbę 10 000 rejestracji.
+
+-   Warto zauważyć duże zróżnicowanie cenowe pomiędzy markami premium (np. Lamborghini, Ferrari) a budżetowymi (np. Smart, Dacia).
+    Wysokie ceny luksusowych marek znacząco podnoszą średnią cenę całego zbioru, a pojazdy budżetowe dominują w sprzedaży pod względem liczby rejestracji.
