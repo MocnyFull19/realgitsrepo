@@ -463,6 +463,9 @@ ggplot(samochody_avg_top_5_year, aes(x = avg_mileage, y = avg_price_in_pln, colo
 
 ## 3 Analiza opisowa {style="color:green"}
 
+W tej sekcji przeanalizujemy podstawowe miary statystyczne, takie jak średnia, mediana, minimalne i maksymalne wartości oraz odchylenie standardowe dla kluczowych zmiennych, takich jak przebieg, czy pojemność silnika, a bliżej zbadamy właściowości na przykład skośność i kurtoza dla cen samochodów w zależności od marki.
+Ponadto, zbadamy istniejące korelacje między zmiennymi numerycznymi i sprawdzimy jakie mają wpływ na cenę samochodu.
+
 ```{r, include=FALSE}
 # Podsumowanie danych
 summary_stats <- dfSummary(dane)
@@ -470,8 +473,15 @@ print(summary_stats)
 
 #HTML
 print(summary_stats, method = "browser", file = "report.html")
+```
 
+Średnia cena samochodów w całym zbiorze wynosi **76 580,2 PLN**, przy odchyleniu standardowym równym **100 937 PLN**, co wskazuje na znaczną zmienność cen w analizowanym zestawie danych.
+Minimalna cena samochodu to **1 111 PLN**, mediana wynosi **46 900 PLN**, a maksymalna cena osiąga aż **2 550 000 PLN**, co świadczy o dużej rozpiętości cen w zbiorze.
 
+Rozstęp międzykwartylowy (IQR), czyli różnica między trzecim a pierwszym kwartylem, wynosi **66 099 PLN**, co pokazuje zakres, w którym znajduje się środkowe 50% cen samochodów.
+Współczynnik zmienności (CV), obliczony jako stosunek odchylenia standardowego do średniej, wynosi **1,3** (130%), co dodatkowo podkreśla znaczną rozbieżność cen w analizie.
+
+```{r, include=FALSE}
 ggcorr(
   data = dane %>% select(where(is.numeric)),
   method = c("pairwise.complete.obs" , "pearson"),
@@ -481,18 +491,20 @@ ggcorr(
     axis.text.x = element_text(hjust = 1), 
     axis.text.y = element_text(hjust = 1)
   )
+```
 
-var(dane$price_in_pln) #variance
-coeff_var<-sd(dane$price_in_pln)/mean(dane$price_in_pln) #coefficient of variability %
-coeff_var
-IQR(dane$price_in_pln)# difference between quartiles =Q3-Q1 
-sx<-IQR(dane$price_in_pln)/2  #interquartile deviation
-coeff_varx<-sx/median(dane$price_in_pln) #IQR coefficient of variability %
-coeff_varx
-min(dane$price_in_pln)
-max(dane$price_in_pln)
-quantile(dane$price_in_pln,probs=c(0,0.1,0.25,0.5,0.75,0.95,1),na.rm=TRUE)
+1.  **Rok produkcji** ma silny związek z **przebiegiem** (korelacja -0,7) – nowsze samochody mają zazwyczaj niższy przebieg.
 
+2.  **Cena samochodu** jest najbardziej zależna od **roku produkcji** (korelacja 0,5) – nowsze modele są droższe.
+
+3.  **Przebieg** również wpływa na cenę (korelacja -0,4) – samochody z niższym przebiegiem są droższe.
+
+4.  Pozostałe zależności, np.
+    między pojemnością silnika a ceną lub przebiegiem, są słabe i nie mają znaczącego wpływu.
+
+Podsumowując, **rok produkcji** i **przebieg** to kluczowe czynniki wpływające na cenę samochodu w tym zbiorze danych.
+
+```{r, include=FALSE}
 # Grupowanie danych po 'brand' i obliczanie statystyk dla każdej grupy
 library(dplyr)
 
@@ -537,9 +549,28 @@ kable(pelna_tabela,
                     "Odchylenie ćwiartkowe", "Skośność", "Kurtoza"),
       caption = "Podsumowanie cen samochodów według marki (w tym ogólnie)")
 
-write_xlsx(pelna_tabela, "podsumowanie_cen_samochodow_z_ogolem.xlsx")
+View(pelna_tabela)
 
 ```
+
+Statystyki zbiorcze dla wszystkich marek samochodów kształtują się następująco: średnia cena samochodów wynosi **76 580,17 PLN**, ale rozkład cen jest bardzo szeroki, co wskazuje na dużą różnorodność oferty.
+Ceny wahają się od **1 111 PLN** do **2 550 000 PLN**, co pokazuje, że w zbiorze znajdują się zarówno bardzo tanie, jak i luksusowe modele.
+Mediana wynosi **46 900 PLN**, co sugeruje, że połowa samochodów jest tańsza niż ta kwota.
+Duże odchylenie standardowe (**100 936,95 PLN**) oraz wysoka skośność (**5,2**) i kurtoza (**52,04**) wskazują na silną prawostronną skośność rozkładu – większość samochodów ma stosunkowo niskie ceny, ale istnieje spora liczba bardzo drogich modeli, które podnoszą średnią.
+
+**Lamborghini** to marka z najwyższymi cenami.
+Średnia cena wynosi **1 271 214,29 PLN**, a zakres cen to **289 000–2 550 000 PLN**.
+To jedyna marka, której ceny przekraczają 2 miliony PLN.
+
+**Smart** ma najniższą medianę cen (**8 100 PLN**) i jednocześnie najwyższą skośność (**3,56**) oraz kurtozę (**18,32**), co wskazuje na silne skupienie się na niskich cenach z nielicznymi wyjątkami.
+
+**Mercedes-Benz** marka o szerokim zakresie cen (**1 500–2 298 999 PLN**) i wysokim odchyleniu standardowym (**174 014,86 PLN**), co pokazuje, że oferuje zarówno modele budżetowe, jak i luksusowe.
+
+**Luksusowe marki** (Lamborghini, Ferrari, Bentley) mają bardzo wysokie ceny, często przekraczające milion PLN, co wpływa na ogólne statystyki, podnosząc średnią i odchylenie standardowe.
+
+**Marki budżetowe** (Daewoo, Dacia, Smart) oferują samochody w niskich cenach, ale ich udział w ogólnej ofercie jest niewielki.
+
+**Marki popularne** (Toyota, Volkswagen, Ford) mają umiarkowane ceny i stosunkowo stabilny rozkład, co czyni je atrakcyjnymi dla większości klientów.
 
 ## 4 Wnioskowanie statystyczne {style="color:green"}
 
@@ -704,7 +735,7 @@ ggscatterstats(
 )
 ```
 
-### 5. Podsumowanie 
+### 5. Podsumowanie
 
 Analiza wykazała, że: ✅ Rodzaj paliwa, marka oraz rok produkcji znacząco wpływają na cenę samochodu.
 ✅ Przebieg ma odwrotny wpływ – im większy, tym niższa cena.
