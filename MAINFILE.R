@@ -590,4 +590,4 @@ ggscatterstats(
 #Warto zauważyć, że przedstawiona analiza dotyczy konkretnego zbioru danych. Wyniki mogą się różnić dla innych zbiorów danych.
 
 
-
+x
