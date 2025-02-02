@@ -3,7 +3,7 @@
 ## 📊 Projekt na przedmiot Analiza Danych
 
 ### 🎯 Cel projektu
-Celem projektu jest analiza czynników wpływających na cenę samochodów. Do tego celu wykorzystujemy dane w formacie CSV pt. **Oferty Samochodów**, które zawierają informacje o samochodach dostępnych na platformie Otomoto, takie jak specyfikacje techniczne, przebieg, rok produkcji i cena.
+Celem projektu jest analiza czynników wpływających na cenę samochodów. Do tego celu wykorzystujemy dane w formacie CSV pt. **samochody_new**, które zawierają informacje o samochodach dostępnych na platformie Otomoto, takie jak specyfikacje techniczne, przebieg, rok produkcji i cena.
 
 ---
 
@@ -12,6 +12,7 @@ Projekt realizowany jest w ramach zespołu:
 - **MoncyFull19**
 - **Domin2002**
 - **Szymon141**
+- **npachos**
 
 ---
 
@@ -19,6 +20,8 @@ Projekt realizowany jest w ramach zespołu:
 1. **Porządkowanie i czyszczenie danych**
    - Usuwanie brakujących wartości
    - Poprawa formatowania i eliminacja nieścisłości
+   - Imputowanie wartości dla brakujących lub błednych danych
+   - Oczyszczenie danych z dalszych brakujących wartości
 
 2. **Eksploracja danych**
    - Podstawowe statystyki opisowe
@@ -29,30 +32,23 @@ Projekt realizowany jest w ramach zespołu:
 
 4. **Modelowanie i wnioskowanie statystyczne**
    - Wykorzystanie metod statystycznych do wyciągania wniosków
-   - Budowanie modeli regresyjnych do przewidywania ceny na podstawie specyfikacji
-
----
-
-### 🗂️ Struktura repozytorium
-- **data/**  
-  Przechowuje plik **Oferty Samochodów.csv** oraz ewentualne przetworzone dane.  
-- **notebooks/**  
-  Zawiera notatniki Jupyter z kolejnymi etapami analizy.  
-- **visualizations/**  
-  Grafiki i wykresy generowane w trakcie projektu.  
-- **src/**  
-  Skrypty w Pythonie do czyszczenia danych, wizualizacji oraz modelowania.
 
 ---
 
 ### 🔧 Wymagania techniczne
 Projekt wymaga instalacji następujących pakietów:
-- `pandas`
-- `numpy`
-- `matplotlib`
-- `seaborn`
-- `scikit-learn`
+- `naniar`
+- `readr`
+- `ggplot2`
+- `dplyr`
+- `tidyverse`
+- `dlookr`
+- `editrules`
+- `VIM`
+- `deducorrect`
+- `ISLR`
+- `visdat`
+- `hot.deck`
+- `mice`
+- `ggstatsplot`
 
-Aby zainstalować wszystkie wymagane pakiety, uruchom:
-```bash
-pip install -r requirements.txt
