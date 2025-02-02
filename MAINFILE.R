@@ -587,7 +587,5 @@ ggscatterstats(
 # Z wykresu i danych statystycznych wynika, że istnieje silna, dodatnia korelacja między rokiem produkcji a ceną samochodu. Nowsze samochody są zazwyczaj droższe, ale na cenę wpływają również inne czynniki, co widać po rozproszeniu punktów na wykresie. Histogramy brzegowe pozwalają na lepsze zrozumienie rozkładu danych dla roku produkcji i ceny.
 
 #Dodatkowe informacje:
-#Warto zauważyć, że przedstawiona analiza dotyczy konkretnego zbioru danych. Wyniki mogą się różnić dla innych zbiorów danych.
-
-
-x
+#Warto zauważyć, że przedstawiona analiza dotyczy konkretnego zbioru danych. Wyniki mogą się różnić dla innych zbiorów danych
+#DONE
