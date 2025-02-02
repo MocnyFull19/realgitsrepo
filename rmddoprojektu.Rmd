@@ -261,9 +261,14 @@ vis_miss(samochody_dowiz, warn_large_data = FALSE)
 
 Możemy zauważyc kompletnosc danych po oczyszczeniu z brakujących wartości
 
-##2 Wizualizacja danych ##3 Analiza opisowa
+## 2 Wizualizacja danych {style="color:green"}
 
-## [4 Wnioskowanie statystyczne]{style="color:green"}
+### 2.1 Tworzenie wykresów danych
+
+
+## 3 Analiza opisowa {style="color:green"}
+
+## 4 Wnioskowanie statystyczne{style="color:green"}
 
 ```{r, include=FALSE}
 library(ggstatsplot)
